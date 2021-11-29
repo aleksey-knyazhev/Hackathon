@@ -1,6 +1,6 @@
-/*drop database if exists "KotlinRegistrationBot";
+/*drop database if exists "RegistrationBot";
 
-create database "KotlinRegistrationBot"
+create database "RegistrationBot"
     with owner postgres;*/
 
 create type status as enum ('свободно', 'не подтверждено', 'подтверждено');
