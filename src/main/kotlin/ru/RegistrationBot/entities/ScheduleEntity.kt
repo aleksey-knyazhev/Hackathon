@@ -7,23 +7,23 @@ import javax.persistence.*
 open class ScheduleEntity {
     @get:Id
     @get:Column(name = "id", nullable = false)
-    open var id: Int = 0
+    var id: Int = 0
 
     @get:Basic
     @get:Column(name = "timeStart", nullable = false)
-    open var timeStart: java.sql.Timestamp? = null
+    var timeStart: java.sql.Timestamp? = null
 
     @get:Basic
     @get:Column(name = "timeEnd", nullable = false)
-    open var timeEnd: java.sql.Timestamp? = null
+    var timeEnd: java.sql.Timestamp? = null
 
     @get:Basic
     @get:Column(name = "status", nullable = false)
-    open var status: String = "свободно"
+    var status: String = "свободно"
 
     @get:Basic
     @get:Column(name = "client", nullable = true)
-    open var client: Int? = null
+    var client: Int? = null
 
 
     override fun toString(): String =

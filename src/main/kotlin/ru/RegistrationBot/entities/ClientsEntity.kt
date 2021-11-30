@@ -7,19 +7,19 @@ import javax.persistence.*
 open class ClientsEntity {
     @get:Id
     @get:Column(name = "id", nullable = false)
-    open var id: Int = 0
+    var id: Int = 0
 
     @get:Basic
     @get:Column(name = "phone", nullable = false)
-    open var phone: Long = 0
+    var phone: Long = 0
 
     @get:Basic
     @get:Column(name = "phoneString", nullable = true)
-    open var phoneString: String? = null
+    var phoneString: String? = null
 
     @get:Basic
     @get:Column(name = "name", nullable = true)
-    open var name: String? = null
+    var name: String? = null
 
 
     override fun toString(): String =
