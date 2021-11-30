@@ -7,23 +7,23 @@ import javax.persistence.*
 open class HistoryEntity {
     @get:Id
     @get:Column(name = "id", nullable = false)
-    var id: Int? = null
+    open var id: Int = 0
 
     @get:Basic
     @get:Column(name = "clinet", nullable = false)
-    var clinet: Int? = null
+    open var clinet: Int = 0
 
     @get:Basic
     @get:Column(name = "date", nullable = false)
-    var date: java.sql.Timestamp? = null
+    open var date: java.sql.Timestamp? = null
 
     @get:Basic
     @get:Column(name = "action", nullable = false)
-    var action: String = "прочее"
+    open var action: String = "прочее"
 
     @get:Basic
     @get:Column(name = "description", nullable = true)
-    var description: String? = null
+    open var description: String? = null
 
 
     override fun toString(): String =
