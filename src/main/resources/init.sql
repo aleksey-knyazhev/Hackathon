@@ -1,9 +1,5 @@
-create type status as enum ('свободно', 'не подтверждено', 'подтверждено');
+create type status as enum ('свободно', 'не подтверждено', 'подтверждено', 'прочее');
 alter type status owner to postgres;
-
-create type scheduleaction as enum ('прочее', 'неподтвержденная запись', 'подтвержденная запись', 'отмена записи');
-alter type scheduleaction owner to postgres;
-
 
 create table clients
 (
@@ -49,7 +45,7 @@ create table history
             primary key,
     clinet      integer                                         not null,
     date        timestamp                                       not null,
-    action      scheduleaction default 'прочее'::scheduleaction not null,
+    action      status default 'прочее'::status not null,
     description varchar(200)
 );
 alter table history
@@ -61,3 +57,4 @@ create unique index history_id_uindex
 insert into clients (phone, "phoneString", name) values (79857197650, '+7 (901)123-12-12', 'Петров');
 insert into clients (phone, "phoneString", name) values (2, '02', 'Иванов');
 insert into schedule ("timeStart", "timeEnd", status, client) values ('2021-11-29 17:47:02.000000', '2021-11-29 17:47:04.000000', 'не подтверждено', 1);
+insert into history (clinet, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено', 'Создал неподтвержденную запись');

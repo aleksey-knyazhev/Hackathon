@@ -19,7 +19,7 @@ open class ScheduleEntity {
 
     @get:Basic
     @get:Column(name = "status", nullable = false)
-    var status: Any? = null
+    var status: String = "свободно"
 
     @get:Basic
     @get:Column(name = "client", nullable = true)

@@ -19,7 +19,7 @@ open class HistoryEntity {
 
     @get:Basic
     @get:Column(name = "action", nullable = false)
-    var action: Any? = null
+    var action: String = "прочее"
 
     @get:Basic
     @get:Column(name = "description", nullable = true)
