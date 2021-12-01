@@ -8,7 +8,10 @@ create table clients
             primary key,
     phone         bigint not null,
     "phoneString" varchar(18),
-    name          varchar(100)
+    "telegramId" bigint,
+    "userName" varchar(100) not null,
+    "firstName" varchar(100),
+    "lastName" varchar(100)
 );
 alter table clients
     owner to postgres;
@@ -54,7 +57,7 @@ create unique index history_id_uindex
     on history (id);
 
 
-insert into clients (phone, "phoneString", name) values (79857197650, '+7 (901)123-12-12', 'Петров');
-insert into clients (phone, "phoneString", name) values (2, '02', 'Иванов');
+insert into clients (phone, "phoneString", "telegramId", "userName", "firstName", "lastName") values (79857197650, '+7 (901)123-12-12', 123456789, '@Pentrov', 'Петр', 'Петров');
+insert into clients (phone, "phoneString", "telegramId", "userName", "firstName", "lastName") values (2, '02', 234567890, '@Ivanov', 'Иван', 'Иванов');
 insert into schedule ("timeStart", "timeEnd", status, client) values ('2021-11-29 17:47:02.000000', '2021-11-29 17:47:04.000000', 'не подтверждено', 1);
 insert into history (clinet, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено', 'Создал неподтвержденную запись');
