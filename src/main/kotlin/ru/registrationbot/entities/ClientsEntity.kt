@@ -1,32 +1,25 @@
-package ru.RegistrationBot.entities
+package ru.registrationbot.entities
 
 import javax.persistence.*
 
 @Entity
 @Table(name = "clients", schema = "public", catalog = "RegistrationBot")
 open class ClientsEntity {
-    @get:Id
-    @get:Column(name = "id", nullable = false)
+    @Id
+    @Column(name = "id", nullable = false)
     var id: Int = 0
 
-    @get:Basic
-    @get:Column(name = "phone", nullable = false)
-    var phone: Long = 0
+    @Column(name = "chatId", nullable = false)
+    var chatId: String? = null
 
-    @get:Basic
-    @get:Column(name = "phoneString", nullable = true)
-    var phoneString: String? = null
-
-    @get:Basic
-    @get:Column(name = "name", nullable = true)
+    @Column(name = "name", nullable = true)
     var name: String? = null
 
 
     override fun toString(): String =
         "Entity of type: ${javaClass.name} ( " +
                 "id = $id " +
-                "phone = $phone " +
-                "phoneString = $phoneString " +
+                "telegramId = $chatId " +
                 "name = $name " +
                 ")"
 
@@ -39,8 +32,7 @@ open class ClientsEntity {
         other as ClientsEntity
 
         if (id != other.id) return false
-        if (phone != other.phone) return false
-        if (phoneString != other.phoneString) return false
+        if (chatId != other.chatId) return false
         if (name != other.name) return false
 
         return true

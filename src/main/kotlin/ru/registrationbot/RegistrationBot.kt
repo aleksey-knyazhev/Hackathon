@@ -1,4 +1,4 @@
-package ru.RegistrationBot
+package ru.registrationbot
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -9,14 +9,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
-import ru.RegistrationBot.dto.UserInfo
-import ru.RegistrationBot.entities.HistoryEntity
-import ru.RegistrationBot.entities.ScheduleEntity
-import java.text.SimpleDateFormat
+import ru.registrationbot.entities.HistoryEntity
+import ru.registrationbot.entities.ScheduleEntity
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
 
 
 @EnableScheduling
