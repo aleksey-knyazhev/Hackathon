@@ -1,6 +1,5 @@
-package ru.registrationbot.service
+package ru.registrationbot.api.service
 
-import ru.registrationbot.dto.UserInfo
 import java.time.LocalDate
 
 interface TelegramBotService {

@@ -44,7 +44,7 @@ create table history
     id          serial
         constraint history_pk
             primary key,
-    clinet      integer                                         not null,
+    client      integer                                         not null,
     date        timestamp                                       not null,
     action      status default 'прочее'::status not null,
     description varchar(200)
@@ -58,4 +58,4 @@ create unique index history_id_uindex
 insert into clients ("telegramId", "userName", "firstName", "lastName") values (123456789, '@Pentrov', 'Петр', 'Петров');
 insert into clients ("telegramId", "userName", "firstName", "lastName") values (234567890, '@Ivanov', 'Иван', 'Иванов');
 insert into schedule ("timeStart", "timeEnd", status, client) values ('2021-11-29 17:47:02.000000', '2021-11-29 17:47:04.000000', 'не подтверждено', 1);
-insert into history (clinet, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено', 'Создал неподтвержденную запись');
+insert into history (client, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено', 'Создал неподтвержденную запись');

@@ -1,4 +1,4 @@
-package ru.registrationbot.service
+package ru.registrationbot.api.service
 
 interface ManagerService {
 
