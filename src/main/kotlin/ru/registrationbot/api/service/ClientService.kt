@@ -6,7 +6,7 @@ interface ClientService {
 
     /**
      * Метод для создания записи
-     * idRecording - id записи
+     * idRecording - id записи в таблице расписаний
      * user - данные о клиенте
      */
     fun addRecording(idRecording: Long, user: UserInfo)
