@@ -1,18 +1,24 @@
 package ru.RegistrationBot
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
+import ru.RegistrationBot.entities.HistoryEntity
+import ru.RegistrationBot.entities.ScheduleEntity
 import java.text.SimpleDateFormat
+import java.time.Duration
 import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
 import java.util.*
 
+
+@EnableScheduling
 @Service
 class RegistrationBot : TelegramLongPollingBot() {
     @Value("\${telegram.botName}")
@@ -24,6 +30,8 @@ class RegistrationBot : TelegramLongPollingBot() {
     @Value("\${telegram.doctor.chatId}")
     private val doctor: Long = 0
 
+    //видимость chatid на весь класс
+    var chatId = 1L
     override fun getBotToken(): String = token
 
     override fun getBotUsername(): String = botName
@@ -31,7 +39,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     override fun onUpdateReceived(update: Update) {
         if (update.hasMessage()) {
             val message = update.message
-            val chatId = message.chatId
+            chatId = message.chatId
             var buttons: MutableList<String> = mutableListOf("Главное меню")
             var date: String
             var time: String
@@ -137,5 +145,23 @@ class RegistrationBot : TelegramLongPollingBot() {
         val text = "Хотели бы вам напомнить, что $date в $time вы записаны на прием. Подтвердите запись или отмените ее"
         sendNotification(chatId, text, buttons)
     }
+    @Scheduled(cron = "0 0 0 * * *")
+    private fun sendNotificationByShedule(){
+
+
+        val historyData = mutableListOf<HistoryEntity>()
+        val currentDate =  LocalDateTime.now()
+        for(history in historyData){
+            val date = history.date?.toLocalDateTime()
+            val duration = Duration.between(currentDate, date)
+            if(duration.toDays() == 1L){
+                val schedule = mutableListOf<ScheduleEntity>()
+                for(sc in schedule)
+                    //Пока непонятно как передавать chatId и time
+                requestConfirmation(chatId,history.date.toString(),sc.timeStart.toString())
+            }
+        }
+    }
+
 
 }
