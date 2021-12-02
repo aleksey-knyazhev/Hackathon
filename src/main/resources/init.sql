@@ -60,4 +60,4 @@ create unique index history_id_uindex
 insert into clients (phone, telegram_id, user_name, first_name, last_name) values (9011231212, 123456789, '@Pentrov', 'Петр', 'Петров');
 insert into clients (phone, telegram_id, user_name, first_name, last_name) values (9023456789, 234567890, '@Ivanov', 'Иван', 'Иванов');
 insert into history (clinet, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено'::status, 'Создал неподтвержденную запись');
--- insert into schedule (record_date, time_start, time_end, status, client) values ('2021-1-1', '10:00', '11:00', 'BOOKED', 1);
+insert into schedule (record_date, time_start, time_end, status, client) values ('2021-1-1', '10:00', '11:00', 'BOOKED', 1);
