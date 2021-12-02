@@ -1,26 +1,27 @@
 package ru.registrationbot.entities
 
+import ru.registrationbot.enum.TimeslotStatus
+import java.time.LocalDate
+import java.time.LocalTime
 import javax.persistence.*
 
 @Entity
 @Table(name = "schedule", schema = "public", catalog = "RegistrationBot")
-open class ScheduleEntity {
+class ScheduleEntity {
     @Id
-    @Column(name = "id", nullable = false)
-    var id: Long = 0
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int = 0
 
-    @Column(name = "timeStart", nullable = false)
-    var timeStart: java.sql.Timestamp? = null
+    lateinit var recordDate: LocalDate
 
-    @Column(name = "timeEnd", nullable = false)
-    var timeEnd: java.sql.Timestamp? = null
+    lateinit var timeStart: LocalTime
 
-    @Column(name = "status", nullable = false)
+    lateinit var timeEnd: LocalTime
+
     @Enumerated(EnumType.STRING)
-    lateinit var status: State
+    lateinit var status: TimeslotStatus
 
-    @Column(name = "client", nullable = true)
-    var client: Long? = null
+    var client: Int? = null
 
 
     override fun toString(): String =

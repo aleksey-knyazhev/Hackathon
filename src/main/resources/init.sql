@@ -19,23 +19,28 @@ create unique index telegram_id_uindex
 
 create table schedule
 (
-    id          serial
-        constraint schedule_pk
-            primary key,
-    time_start timestamp                         not null,
-    time_end   timestamp                         not null,
-    status      varchar(15)                      not null,
-    client      integer
+    id          SERIAL PRIMARY KEY,
+    record_date DATE    NOT NULL,
+    time_start  TIME    NOT NULL,
+    time_end    TIME    NOT NULL,
+    status      VARCHAR NOT NULL,
+    client      INTEGER
 );
-alter table schedule
-    owner to postgres;
-create unique index schedule_time_start_uindex
-    on schedule (time_start);
+
+
+-- alter table schedule
+--     owner to postgres;
+-- create
+-- unique index schedule_id_uindex
+--     on schedule (id);
+-- create
+-- unique index schedule_time_start_uindex
+--     on schedule (time_start);
 
 
 create table history
 (
-    id          serial
+    id serial
         constraint history_pk
             primary key,
     client      integer                                         not null,
