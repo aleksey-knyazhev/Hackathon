@@ -20,4 +20,14 @@ interface TelegramBotService {
      * firstName - имя клиента (при наличии)
      */
     fun addNotification(date: LocalDate, time: String, chatId: Long, login: String, firstName: String?)
+
+    /**
+     * Метод для получения дат, на которые открыта запись
+     */
+    fun getDates():List<LocalDate>
+
+    /**
+     * Метод для получения свободных слотов времени для конкретной даты
+     */
+    fun getTimesForDate(date: LocalDate):List<String>
 }
