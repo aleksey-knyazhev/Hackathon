@@ -58,6 +58,7 @@ interface TelegramBotService {
     /**
      * Метод для удаления записи
      * idRecording - id записи
+     * при удалении записи нужно оповестить клиента с помощью метода sendCancelNotification() класса RegistrationBot
      */
     fun deleteRecording(idRecording: Long)
 
@@ -71,6 +72,7 @@ interface TelegramBotService {
     /**
      * Метод для удаления пользователя
      * idUser - id клиента
+     * при удалении пользователя нужно отправить ему уведомление с помощью метода sendDeleteNotification() класса RegistrationBot
      */
     fun deleteUserInfo(idUser: Long)
 
@@ -79,4 +81,18 @@ interface TelegramBotService {
      * idUser - id клиента
      */
     fun getHistory(idUser: Long):List<String>
+
+    /**
+     * Метод для подтверждения записи
+     * userInfo - информация о клиенте
+     * Ищем запись на завтрашний день для указанного пользователя и проставляем соответствующий статус
+     */
+    fun confirmRecording(userInfo: UserInfo)
+
+    /**
+     * Метод для удаления записи
+     * userInfo - информация о клиенте
+     * Ищем запись на завтрашний день для указанного пользователя и освобождаем ее
+     */
+    fun cancelRecording(userInfo: UserInfo)
 }
