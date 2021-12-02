@@ -7,7 +7,7 @@ import javax.persistence.*
 open class ScheduleEntity {
     @Id
     @Column(name = "id", nullable = false)
-    var id: Int = 0
+    var id: Long = 0
 
     @Column(name = "timeStart", nullable = false)
     var timeStart: java.sql.Timestamp? = null
@@ -16,10 +16,11 @@ open class ScheduleEntity {
     var timeEnd: java.sql.Timestamp? = null
 
     @Column(name = "status", nullable = false)
-    var status: String = "свободно"
+    @Enumerated(EnumType.STRING)
+    lateinit var status: State
 
     @Column(name = "client", nullable = true)
-    var client: Int? = null
+    var client: Long? = null
 
 
     override fun toString(): String =
@@ -49,4 +50,11 @@ open class ScheduleEntity {
     }
 
 }
+
+enum class State{
+    FREE,
+    BUSY,
+    CONFIRM
+}
+
 
