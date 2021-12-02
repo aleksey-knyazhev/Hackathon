@@ -22,11 +22,11 @@ create unique index clients_phone_uindex
 
 create table schedule
 (
-    id          serial
+    id serial
         constraint schedule_pk
             primary key,
-    time_start timestamp                         not null,
-    time_end   timestamp                         not null,
+    time_start timestamp not null,
+    time_end   timestamp not null,
     status      status default 'свободно'::status not null,
     client      integer
 );
@@ -40,12 +40,12 @@ create unique index schedule_time_start_uindex
 
 create table history
 (
-    id          serial
+    id serial
         constraint history_pk
             primary key,
-    client      integer                                         not null,
-    date        timestamp                                       not null,
-    action      status                                                  ,
+    clinet      integer not null,
+    date        timestamp not null,
+    action      status,
     description varchar(200)
 );
 alter table history
@@ -53,7 +53,8 @@ alter table history
 create unique index history_id_uindex
     on history (id);
 
+
 insert into clients (phone, telegram_id, user_name, first_name, last_name) values ('+7 (901)123-12-12', 123456789, '@Pentrov', 'Петр', 'Петров');
 insert into clients (phone, telegram_id, user_name, first_name, last_name) values ('02', 234567890, '@Ivanov', 'Иван', 'Иванов');
-insert into schedule (time_start, time_end, status, client) values ('2021-11-29 17:47:02.000000', '2021-11-29 17:47:04.000000', 'не подтверждено', 1);
-insert into history (client, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено', 'Создал неподтвержденную запись');
+insert into schedule (time_start, time_end, status, client) values ('2021-11-29 17:47:02.000000', '2021-11-29 17:47:04.000000', 'не подтверждено'::status, 1);
+insert into history (clinet, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено'::status, 'Создал неподтвержденную запись');
