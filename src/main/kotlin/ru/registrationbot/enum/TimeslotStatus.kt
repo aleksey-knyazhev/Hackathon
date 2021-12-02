@@ -5,6 +5,6 @@ enum class TimeslotStatus(
 ) {
     FREE("Свободно"),
     BOOKED("Запись не подтверждена"),
-    CONFIRMED("Запись пожтверждена"),
+    CONFIRMED("Запись подтверждена"),
     BLOCKED("Запись заблокирована")
 }

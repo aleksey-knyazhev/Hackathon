@@ -7,6 +7,6 @@ import java.util.*
 
 interface SchedulerRepository: CrudRepository<ScheduleEntity, Long> {
 
-    fun findByClient(clientId: Long): Optional<ScheduleEntity>
+    fun findByClient(clientId: Int): Optional<ScheduleEntity>
 
 }

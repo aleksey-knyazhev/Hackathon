@@ -5,7 +5,7 @@ import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.service.DBServiceAnswer
 import ru.registrationbot.dto.UserInfo
 import ru.registrationbot.entities.ClientsEntity
-import ru.registrationbot.entities.State
+import ru.registrationbot.enum.TimeslotStatus
 import javax.transaction.Transactional
 
 @Service
@@ -19,7 +19,7 @@ class ClientServiceImpl(private val repositoryTime: SchedulerRepository,
         val clientId =
                     if (!client.isPresent)
                     {
-                        var newClient = ClientsEntity(
+                        val newClient = ClientsEntity(
                             phone = "01234567", //todo это нужно где-то взять
                             chatId = user.chatId,
                             userName = user.userName,
@@ -30,9 +30,9 @@ class ClientServiceImpl(private val repositoryTime: SchedulerRepository,
                     {client.get().id}
 
         val record = repositoryTime.findById(idRecording)
-        return if (record.isPresent && State.FREE == record.get().status)
+        return if (record.isPresent && TimeslotStatus.FREE == record.get().status)
                 {
-                    record.get().status = State.BUSY
+                    record.get().status = TimeslotStatus.BOOKED
                     record.get().client = clientId
 
                     repositoryTime.save(record.get())
@@ -44,7 +44,7 @@ class ClientServiceImpl(private val repositoryTime: SchedulerRepository,
 
 
     @Transactional
-    override fun deleteRecording(idRecording: Long):Long? {
+    override fun deleteRecording(idRecording: Long):Int? {
         val record = repositoryTime.findById(idRecording)
 
         if (!record.isPresent ) //TODO нужно ли проверять статус на занятость слота?
@@ -52,18 +52,17 @@ class ClientServiceImpl(private val repositoryTime: SchedulerRepository,
             return null
         }
 
-        record.get().status = State.FREE
+        record.get().status = TimeslotStatus.FREE
         val clientChatId = record.get().client
         repositoryTime.save(record.get())
         return clientChatId
     }
 
-    override fun confirmRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, State.CONFIRM)
+    override fun confirmRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED)
 
-    override fun cancelRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, State.FREE)
+    override fun cancelRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.FREE)
 
-
-    private fun changeStatusTimeSlot(userInfo: UserInfo, status: State):DBServiceAnswer {
+    private fun changeStatusTimeSlot(userInfo: UserInfo, status: TimeslotStatus):DBServiceAnswer {
 
         val client = repositoryClient.findByChatId(userInfo.chatId)
 
