@@ -3,12 +3,12 @@ alter type status owner to postgres;
 
 create table clients
 (
-    id            serial
+    id serial
         constraint clients_pk
             primary key,
-    phone         bigint not null,
+    phone bigint not null,
     "phoneString" varchar(18),
-    "telegramId" bigint,
+    "telegramId" bigint not null,
     "userName" varchar(100) not null,
     "firstName" varchar(100),
     "lastName" varchar(100)
