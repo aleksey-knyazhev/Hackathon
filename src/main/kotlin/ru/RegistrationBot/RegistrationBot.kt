@@ -7,7 +7,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 @Service
 class RegistrationBot : TelegramLongPollingBot() {
@@ -39,6 +43,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                             buttons.add("Открыть запись")
                             buttons.add("Показать свободное время")
                             "Здравствуй, хозяин!"
+
                         }
                         messageText.startsWith("Открыть запись") -> "Введите дату в формате ГГГГ-ММ-ДД\nНапример: 2021-10-08"
                         messageText.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) -> {
@@ -79,17 +84,26 @@ class RegistrationBot : TelegramLongPollingBot() {
                         "Выберите свободное время для записи"
                     }
                     messageText.matches(Regex("\\d{2}:\\d{2}")) -> {
+                        date = messageText
                         time = messageText
-                        //метод, который принимает дату и время для создания записи
-                        // LocalDate.parse(date)
-                        "Запись создана успешно"
+                        requestConfirmation(chatId, date, time)
+                        when {
+                            messageText.startsWith("Подтвердить запись") -> "Запись создана успешно"
 
-                    }
+
+                            else -> "Запись не подтверждена"
+                        }
+
+                            //метод, который принимает дату и время для создания записи
+                            // LocalDate.parse(date)
+                        }
+
                     else -> text
                 }
             } else {
                 "Я понимаю только текст"
             }
+
             sendNotification(chatId, responseText, buttons)
         }
     }
@@ -97,7 +111,9 @@ class RegistrationBot : TelegramLongPollingBot() {
     private fun sendNotification(chatId: Long, responseText: String, buttons: List<String>) {
         val responseMessage = SendMessage(chatId.toString(), responseText)
         responseMessage.enableMarkdown(true)
+
         responseMessage.replyMarkup = getReplyMarkup(buttons)
+
 
         execute(responseMessage)
     }
@@ -112,13 +128,14 @@ class RegistrationBot : TelegramLongPollingBot() {
         return markup
     }
 
-    private fun requestConfirmation(chatId: Long, time: String) {
+    private fun requestConfirmation(chatId: Long, date: String, time: String) {
         var buttons: List<String> = listOf(
             "Главное меню",
             "Подтвердить запись",
             "Отменить запись"
         )
-        val text = "Хотели бы вам напомнить, что завтра в $time вы записаны на прием. Подтвердите запись или отмените ее"
+        val text = "Хотели бы вам напомнить, что $date в $time вы записаны на прием. Подтвердите запись или отмените ее"
         sendNotification(chatId, text, buttons)
     }
+
 }
