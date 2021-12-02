@@ -1,4 +1,4 @@
-package ru.RegistrationBot
+package ru.registrationbot
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

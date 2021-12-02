@@ -6,8 +6,6 @@ create table clients
     id serial
         constraint clients_pk
             primary key,
-    phone bigint not null,
-    "phoneString" varchar(18),
     "telegramId" bigint not null,
     "userName" varchar(100) not null,
     "firstName" varchar(100),
@@ -57,7 +55,7 @@ create unique index history_id_uindex
     on history (id);
 
 
-insert into clients (phone, "phoneString", "telegramId", "userName", "firstName", "lastName") values (79857197650, '+7 (901)123-12-12', 123456789, '@Pentrov', 'Петр', 'Петров');
-insert into clients (phone, "phoneString", "telegramId", "userName", "firstName", "lastName") values (2, '02', 234567890, '@Ivanov', 'Иван', 'Иванов');
+insert into clients ("telegramId", "userName", "firstName", "lastName") values (123456789, '@Pentrov', 'Петр', 'Петров');
+insert into clients ("telegramId", "userName", "firstName", "lastName") values (234567890, '@Ivanov', 'Иван', 'Иванов');
 insert into schedule ("timeStart", "timeEnd", status, client) values ('2021-11-29 17:47:02.000000', '2021-11-29 17:47:04.000000', 'не подтверждено', 1);
 insert into history (clinet, date, action, description) values (1, '2021-11-30 17:06:29.000000', 'не подтверждено', 'Создал неподтвержденную запись');

@@ -1,35 +1,31 @@
-package ru.RegistrationBot.entities
+package ru.registrationbot.entities
 
 import javax.persistence.*
 
 @Entity
 @Table(name = "history", schema = "public", catalog = "RegistrationBot")
 open class HistoryEntity {
-    @get:Id
-    @get:Column(name = "id", nullable = false)
+    @Id
+    @Column(name = "id", nullable = false)
     var id: Int = 0
 
-    @get:Basic
-    @get:Column(name = "clinet", nullable = false)
-    var clinet: Int = 0
+    @Column(name = "client", nullable = false)
+    var client: Int = 0
 
-    @get:Basic
-    @get:Column(name = "date", nullable = false)
+    @Column(name = "date", nullable = false)
     var date: java.sql.Timestamp? = null
 
-    @get:Basic
-    @get:Column(name = "action", nullable = false)
+    @Column(name = "action", nullable = false)
     var action: String = "прочее"
 
-    @get:Basic
-    @get:Column(name = "description", nullable = true)
+    @Column(name = "description", nullable = true)
     var description: String? = null
 
 
     override fun toString(): String =
         "Entity of type: ${javaClass.name} ( " +
                 "id = $id " +
-                "clinet = $clinet " +
+                "clinet = $client " +
                 "date = $date " +
                 "action = $action " +
                 "description = $description " +
@@ -44,7 +40,7 @@ open class HistoryEntity {
         other as HistoryEntity
 
         if (id != other.id) return false
-        if (clinet != other.clinet) return false
+        if (client != other.client) return false
         if (date != other.date) return false
         if (action != other.action) return false
         if (description != other.description) return false
