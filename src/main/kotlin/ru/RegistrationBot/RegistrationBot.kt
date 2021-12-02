@@ -167,25 +167,6 @@ class RegistrationBot : TelegramLongPollingBot() {
         val text = "Хотели бы вам напомнить, что $date в $time вы записаны на прием. Подтвердите запись или отмените ее"
         sendNotification(chatId, text, buttons)
     }
-    @Scheduled(cron = "0 0 0 * * *")
-    private fun sendNotificationByShedule(){
-
-
-        val historyData = mutableListOf<HistoryEntity>()
-        val currentDate =  LocalDateTime.now()
-        for(history in historyData){
-            val date = history.date?.toLocalDateTime()
-            val duration = Duration.between(currentDate, date)
-            if(duration.toDays() == 1L){
-                val schedule = mutableListOf<ScheduleEntity>()
-                for(sc in schedule)
-                    //Пока непонятно как передавать chatId и time
-                requestConfirmation(chatId,history.date.toString(),sc.timeStart.toString())
-            }
-        }
-    }
-
-
 
     private fun sendCancelNotification(chatId: Long, time: String) {
         var buttons: List<String> = listOf("Главное меню")
@@ -197,5 +178,21 @@ class RegistrationBot : TelegramLongPollingBot() {
         var buttons: List<String> = listOf("Главное меню")
         val text = "Все Ваши записи были удалены"
         sendNotification(chatId, text, buttons)
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    private fun sendNotificationByShedule(){
+        val historyData = mutableListOf<HistoryEntity>()
+        val currentDate =  LocalDateTime.now()
+        for(history in historyData){
+            val date = history.date?.toLocalDateTime()
+            val duration = Duration.between(currentDate, date)
+            if(duration.toDays() == 1L){
+                val schedule = mutableListOf<ScheduleEntity>()
+                for(sc in schedule)
+                //Пока непонятно как передавать chatId и time
+                    requestConfirmation(chatId,history.date.toString(),sc.timeStart.toString())
+            }
+        }
     }
 }
