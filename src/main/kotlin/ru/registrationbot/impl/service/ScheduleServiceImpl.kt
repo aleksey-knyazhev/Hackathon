@@ -1,12 +1,11 @@
 package ru.registrationbot.impl.service
 
-
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.registrationbot.api.service.SchedulerService
-import ru.registrationbot.entities.ScheduleEntity
-import ru.registrationbot.enum.TimeslotStatus
-import ru.registrationbot.repository.ScheduleRepository
+import ru.registrationbot.impl.entities.ScheduleEntity
+import ru.registrationbot.api.enums.TimeslotStatus
+import ru.registrationbot.api.repository.ScheduleRepository
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -29,12 +28,12 @@ class ScheduleServiceImpl(
         val shiftEnd = LocalTime.parse(twoDates.last())
         while (shiftEnd.minusHours(1L) >= currentStartTime) {
             scheduleRepository.save(
-                ScheduleEntity().apply {
-                    recordDate = date
-                    timeStart = currentStartTime
-                    timeEnd = currentStartTime.plusHours(1L)
+                ScheduleEntity(
+                    recordDate = date,
+                    timeStart = currentStartTime,
+                    timeEnd = currentStartTime.plusHours(1L),
                     status = TimeslotStatus.FREE
-                }
+                )
             )
             currentStartTime = currentStartTime.plusHours(1)
         }
