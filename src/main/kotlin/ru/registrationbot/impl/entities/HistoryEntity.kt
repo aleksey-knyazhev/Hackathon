@@ -1,5 +1,6 @@
 package ru.registrationbot.impl.entities
 
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -14,7 +15,7 @@ data class HistoryEntity(
     var client: Int,
 
     @Column(name = "date", nullable = false)
-    var date: java.sql.Timestamp?,
+    var date: LocalDateTime?,
 
     @Column(name = "action", nullable = false)
     var action: String,

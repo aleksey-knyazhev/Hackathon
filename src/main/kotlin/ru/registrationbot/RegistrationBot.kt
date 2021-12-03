@@ -181,7 +181,7 @@ class RegistrationBot : TelegramLongPollingBot() {
         val historyData = mutableListOf<HistoryEntity>()
         val currentDate =  LocalDateTime.now()
         for(history in historyData){
-            val date = history.date?.toLocalDateTime()
+            val date = history.date
             val duration = Duration.between(currentDate, date)
             if(duration.toDays() == 1L){
                 val schedule = mutableListOf<ScheduleEntity>()
