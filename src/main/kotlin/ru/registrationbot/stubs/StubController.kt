@@ -17,24 +17,59 @@ import kotlin.random.Random
 @RestController
 class StubController(@Autowired private var service: ClientService) {
 
-    final val json = """{"chat": {"id" : "${Random.nextLong(1000L)}",
-        |                         "first_name" : "Петр",
-        |                         "last_name" : "Петров",
-        |                         "username" : "any"},
-        |                        "contact" : {"phone_number": "1234567891"}}""".trimMargin()
-    final val mapper = jacksonObjectMapper()
-
-
-    var message: Message = mapper.readValue<Message>(json)
-
-    val userInfo = UserInfo(message)
-
-
-    @GetMapping(value = ["/add/{id}"])
-    fun addRecord(@PathVariable id: Long): ResponseEntity<Any> {
+    //idTimeSlot - id записи таблицы Scheduler с проверкой добавления клиента
+    @GetMapping(value = ["/add/{idTimeSlot}"])
+    fun addRecording(@PathVariable idTimeSlot: Long): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.addRecording(id, userInfo))
+            .body(service.addRecording(idTimeSlot, UserInfo(getMessage(Random.nextLong(1000L)))))
 
     }
 
+    //idTimeSlot - id записи таблицы Scheduler
+    // idChatClient- идентификатор чата из таблицы клиентов(это только для тестов - так он будет приходить к нам естественным путес с бота)
+    @GetMapping(value = ["/add/{idTimeSlot}/{idChatClient}"])
+    fun addRecording(@PathVariable idTimeSlot: Long, @PathVariable idChatClient: Long): ResponseEntity<Any> {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(service.addRecording(idTimeSlot, UserInfo(getMessage(idChatClient))))
+
+    }
+
+    //idTimeSlot - id записи таблицы Scheduler
+    @GetMapping(value = ["/delete/{idTimeSlot}"])
+    fun delRecording(@PathVariable idTimeSlot: Long): ResponseEntity<Any> {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(service.deleteRecording(idTimeSlot))
+
+    }
+
+    //idUser - id записи таблицы Client
+    @GetMapping(value = ["/cancel/{idUser}"])
+    fun cancelRecording(@PathVariable idUser: Long): ResponseEntity<Any> {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(service.cancelRecording(UserInfo(getMessage(idUser))))
+
+    }
+
+    //idUser - id записи таблицы Client
+    @GetMapping(value = ["/confirm/{idUser}"])
+    fun confirmRecord(@PathVariable idUser: Long): ResponseEntity<Any> {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(service.confirmRecording(UserInfo(getMessage(idUser))))
+
+    }
+
+
+    private fun getMessage(chatId: Long): Message {
+
+        val json = """{"chat": {"id" : "$chatId",
+        |                         "first_name" : "Петр",
+        |                         "last_name" : "Петров",
+        |                         "username" : "any"},
+        |                         "contact" : {"phone_number": "1234567891"}}""".trimMargin()
+
+
+        val mapper = jacksonObjectMapper()
+
+        return mapper.readValue(json)
+    }
 }
