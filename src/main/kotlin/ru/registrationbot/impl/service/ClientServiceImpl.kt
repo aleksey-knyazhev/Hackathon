@@ -7,12 +7,17 @@ import ru.registrationbot.api.dto.UserInfo
 import ru.registrationbot.impl.entities.ClientsEntity
 import ru.registrationbot.api.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ClientRepository
+import ru.registrationbot.api.repository.HistoryRepository
 import ru.registrationbot.api.repository.ScheduleRepository
+import ru.registrationbot.impl.entities.HistoryEntity
+import ru.registrationbot.impl.entities.ScheduleEntity
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
 class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
-                        private val repositoryClient: ClientRepository
+                        private val repositoryClient: ClientRepository,
+                        private val repositoryHistory: HistoryRepository
 ) : ClientService {
 
     @Transactional
@@ -35,10 +40,13 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         val record = repositoryTime.findById(idRecording)
         return if (record.isPresent && TimeslotStatus.FREE == record.get().status)
                 {
-                    record.get().status = TimeslotStatus.BOOKED
-                    record.get().client = clientId
+                    val timeSlot = record.get()
+                    timeSlot.status = TimeslotStatus.BOOKED
+                    timeSlot.client = clientId
 
-                    repositoryTime.save(record.get())
+                    repositoryTime.save(timeSlot)
+                    addHistory(clientId!!, timeSlot)
+
                     DBServiceAnswer.SUCCESS
                 }
                 else
@@ -78,13 +86,25 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         if (!record.isPresent)
             return DBServiceAnswer.RECORD_NOT_FOUND
 
-        record.get().status = status
+        val timeSlot = record.get()
+        timeSlot.status = status
         if (status == TimeslotStatus.FREE)
         {
-            record.get().client = null
+            timeSlot.client = null
         }
-        repositoryTime.save(record.get())
+        repositoryTime.save(timeSlot)
+
+        addHistory(client.get().id!!, timeSlot)
 
         return DBServiceAnswer.SUCCESS
+    }
+
+    private fun addHistory(idClient: Int, timeSlot: ScheduleEntity) {
+
+        repositoryHistory.save(
+            HistoryEntity(client = idClient, date = LocalDateTime.now(),
+                action = timeSlot.status.name ,
+                description = "${timeSlot.recordDate} c ${timeSlot.timeStart} до ${timeSlot.timeEnd}"))
+
     }
 }

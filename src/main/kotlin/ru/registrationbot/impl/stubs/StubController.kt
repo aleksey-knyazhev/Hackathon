@@ -67,7 +67,6 @@ class StubController(@Autowired private var service: ClientService) {
         |                         "username" : "any"},
         |                         "contact" : {"phone_number": "1234567891"}}""".trimMargin()
 
-
         val mapper = jacksonObjectMapper()
 
         return mapper.readValue(json)
