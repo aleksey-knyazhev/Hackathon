@@ -16,7 +16,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
 ) : ClientService {
 
     @Transactional
-    override fun addRecording(idRecording: Long, user: UserInfo):Boolean {
+    override fun addRecording(idRecording: Long, user: UserInfo):DBServiceAnswer {
         val client = repositoryClient.findByChatId(user.chatId)
         val clientId =
                     if (!client.isPresent)
@@ -39,10 +39,10 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                     record.get().client = clientId
 
                     repositoryTime.save(record.get())
-                    true
+                    DBServiceAnswer.SUCCESS
                 }
                 else
-                { false }
+                { DBServiceAnswer.FREE_RECORD_NOT_FOUND }
     }
 
 
@@ -55,8 +55,9 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
             return null
         }
 
-        record.get().status = TimeslotStatus.FREE
+        record.get().status = TimeslotStatus.BLOCKED
         val clientChatId = record.get().client
+        record.get().client = null
         repositoryTime.save(record.get())
         return clientChatId
     }
@@ -78,6 +79,10 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
             return DBServiceAnswer.RECORD_NOT_FOUND
 
         record.get().status = status
+        if (status == TimeslotStatus.FREE)
+        {
+            record.get().client = null
+        }
         repositoryTime.save(record.get())
 
         return DBServiceAnswer.SUCCESS

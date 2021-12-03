@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "schedule", schema = "public", catalog = "RegistrationBot")
-class ScheduleEntity (
+data class ScheduleEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,

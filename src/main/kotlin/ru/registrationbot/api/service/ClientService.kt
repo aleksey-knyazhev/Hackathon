@@ -11,7 +11,7 @@ interface ClientService {
      * user - данные о клиенте
      */
     //true- успех, false- ошибка
-    fun addRecording(idRecording: Long, user: UserInfo):Boolean
+    fun addRecording(idRecording: Long, user: UserInfo): DBServiceAnswer
 
     /**
      * Метод для удаления записи

@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "history", schema = "public", catalog = "RegistrationBot")
-class HistoryEntity(
+data class HistoryEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -20,4 +20,5 @@ class HistoryEntity(
     var action: String,
 
     @Column(name = "description", nullable = true)
-    var description: String)
+    var description: String
+)
