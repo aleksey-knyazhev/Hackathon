@@ -1,6 +1,6 @@
-package ru.registrationbot.entities
+package ru.registrationbot.impl.entities
 
-import ru.registrationbot.enums.TimeslotStatus
+import ru.registrationbot.api.enums.TimeslotStatus
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.persistence.*

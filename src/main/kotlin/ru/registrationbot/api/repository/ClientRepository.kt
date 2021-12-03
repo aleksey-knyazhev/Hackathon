@@ -1,8 +1,8 @@
-package ru.registrationbot.repository
+package ru.registrationbot.api.repository
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import ru.registrationbot.entities.ClientsEntity
+import ru.registrationbot.impl.entities.ClientsEntity
 import java.util.*
 
 @Repository

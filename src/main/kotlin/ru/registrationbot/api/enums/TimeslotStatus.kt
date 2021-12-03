@@ -1,4 +1,4 @@
-package ru.registrationbot.enums
+package ru.registrationbot.api.enums
 
 enum class TimeslotStatus(
     val description: String

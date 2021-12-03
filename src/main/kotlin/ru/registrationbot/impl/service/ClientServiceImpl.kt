@@ -2,12 +2,12 @@ package ru.registrationbot.impl.service
 
 import org.springframework.stereotype.Service
 import ru.registrationbot.api.service.ClientService
-import ru.registrationbot.enums.DBServiceAnswer
-import ru.registrationbot.dto.UserInfo
-import ru.registrationbot.entities.ClientsEntity
-import ru.registrationbot.enums.TimeslotStatus
-import ru.registrationbot.repository.ClientRepository
-import ru.registrationbot.repository.ScheduleRepository
+import ru.registrationbot.api.enums.DBServiceAnswer
+import ru.registrationbot.api.dto.UserInfo
+import ru.registrationbot.impl.entities.ClientsEntity
+import ru.registrationbot.api.enums.TimeslotStatus
+import ru.registrationbot.api.repository.ClientRepository
+import ru.registrationbot.api.repository.ScheduleRepository
 import javax.transaction.Transactional
 
 @Service

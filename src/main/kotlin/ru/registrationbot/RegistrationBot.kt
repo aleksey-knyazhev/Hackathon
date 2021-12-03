@@ -9,8 +9,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
-import ru.registrationbot.entities.HistoryEntity
-import ru.registrationbot.entities.ScheduleEntity
+import ru.registrationbot.impl.entities.HistoryEntity
+import ru.registrationbot.impl.entities.ScheduleEntity
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -37,9 +37,9 @@ class RegistrationBot : TelegramLongPollingBot() {
         if (update.hasMessage()) {
             val message = update.message
             chatId = message.chatId
-            var buttons: MutableList<String> = mutableListOf("Главное меню")
-            var date: String
-            var time: String
+            val buttons: MutableList<String> = mutableListOf("Главное меню")
+            val date: String
+            val time: String
             val responseText = if (message.hasText()) {
                 val messageText = message.text
                 val text = if (chatId == doctor) {
@@ -155,7 +155,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     }
 
     private fun requestConfirmation(chatId: Long, date: String, time: String) {
-        var buttons: List<String> = listOf(
+        val buttons: List<String> = listOf(
             "Главное меню",
             "Подтвердить запись",
             "Отменить запись"
@@ -165,13 +165,13 @@ class RegistrationBot : TelegramLongPollingBot() {
     }
 
     private fun sendCancelNotification(chatId: Long, time: String) {
-        var buttons: List<String> = listOf("Главное меню")
+        val buttons: List<String> = listOf("Главное меню")
         val text = "Извините, Ваша запись на завтра в $time отменена"
         sendNotification(chatId, text, buttons)
     }
 
     private fun sendDeleteNotification(chatId: Long) {
-        var buttons: List<String> = listOf("Главное меню")
+        val buttons: List<String> = listOf("Главное меню")
         val text = "Все Ваши записи были удалены"
         sendNotification(chatId, text, buttons)
     }

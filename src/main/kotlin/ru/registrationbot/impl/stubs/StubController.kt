@@ -1,4 +1,4 @@
-package ru.registrationbot.stubs
+package ru.registrationbot.impl.stubs
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import org.telegram.telegrambots.meta.api.objects.Message
 import ru.registrationbot.api.service.ClientService
-import ru.registrationbot.dto.UserInfo
+import ru.registrationbot.api.dto.UserInfo
 import kotlin.random.Random
 
 

@@ -9,8 +9,6 @@ create table clients
     first_name varchar(100),
     last_name varchar(100)
 );
-alter table clients
-    owner to postgres;
 create unique index chat_id_uindex
     on clients (chat_id);
 
@@ -25,17 +23,6 @@ create table schedule
     client      INTEGER
 );
 
-
--- alter table schedule
---     owner to postgres;
--- create
--- unique index schedule_id_uindex
---     on schedule (id);
--- create
--- unique index schedule_time_start_uindex
---     on schedule (time_start);
-
-
 create table history
 (
     id serial
@@ -46,9 +33,6 @@ create table history
     action      varchar(100)                                                  ,
     description varchar(200)
 );
-alter table history
-    owner to postgres;
-
 
 insert into clients (phone, chat_id, user_name, first_name, last_name) values ('9011231212', 123456789, '@Pentrov', 'Петр', 'Петров');
 insert into clients (phone, chat_id, user_name, first_name, last_name) values ('9081231212', 234567890, '@Ivanov', 'Иван', 'Иванов');

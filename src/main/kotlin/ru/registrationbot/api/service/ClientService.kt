@@ -1,7 +1,7 @@
 package ru.registrationbot.api.service
 
-import ru.registrationbot.dto.UserInfo
-import ru.registrationbot.enums.DBServiceAnswer
+import ru.registrationbot.api.dto.UserInfo
+import ru.registrationbot.api.enums.DBServiceAnswer
 
 interface ClientService {
 

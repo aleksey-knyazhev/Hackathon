@@ -1,4 +1,4 @@
-package ru.registrationbot.entities
+package ru.registrationbot.impl.entities
 
 import javax.persistence.*
 

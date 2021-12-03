@@ -1,4 +1,4 @@
-package ru.registrationbot.entities
+package ru.registrationbot.impl.entities
 
 import javax.persistence.*
 
@@ -19,10 +19,10 @@ data class ClientsEntity (
     @Column(name = "user_name")
     var userName: String? = null,
 
-    @Column(name = "firstName")
+    @Column(name = "first_name")
     var firstName: String? = null,
 
-    @Column(name = "lastName")
+    @Column(name = "last_name")
     var lastName: String? = null
 )
 
