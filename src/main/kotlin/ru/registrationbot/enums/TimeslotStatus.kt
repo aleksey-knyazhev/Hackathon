@@ -1,10 +1,10 @@
-package ru.registrationbot.enum
+package ru.registrationbot.enums
 
 enum class TimeslotStatus(
     val description: String
 ) {
     FREE("Свободно"),
     BOOKED("Запись не подтверждена"),
-    CONFIRMED("Запись пожтверждена"),
+    CONFIRMED("Запись подтверждена"),
     BLOCKED("Запись заблокирована")
 }
