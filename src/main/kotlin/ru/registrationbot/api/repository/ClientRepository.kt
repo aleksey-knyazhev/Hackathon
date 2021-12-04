@@ -17,4 +17,7 @@ interface ClientRepository: CrudRepository<ClientsEntity, Long> {
     @Query("Select c from ClientsEntity c left join ScheduleEntity s on c.id = s.client " +
             "where s.recordDate = :exp1 and s.status = :exp2 ")
     fun findByDateAndStatus(@Param("exp1") date: LocalDate, @Param("exp2") status: TimeslotStatus): List<ClientsEntity>
+
+    fun deleteById(id: Int)
+
 }
