@@ -1,5 +1,8 @@
 package ru.registrationbot.api.service
 
+import ru.registrationbot.api.dto.ClientDto
+import ru.registrationbot.api.dto.RecordDto
+
 interface ManagerService {
 
     /**
@@ -7,7 +10,7 @@ interface ManagerService {
      * idRecording - id записи
      * в качестве элементов списка можно возвращать например UserInfo, но обязательно нужно передавать на фронт id пользователя
      */
-    fun getAllUsers():List<String>
+    fun getAllUsers():List<ClientDto>
 
     /**
      * Метод для удаления пользователя
@@ -21,6 +24,6 @@ interface ManagerService {
      * Метод для получения истории по клиенту
      * idUser - id клиента
      */
-    fun getHistory(idUser: Long):List<String>
+    fun getHistory(idUser: Long):List<RecordDto>
 
 }
