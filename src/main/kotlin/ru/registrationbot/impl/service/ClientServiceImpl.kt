@@ -1,6 +1,5 @@
 package ru.registrationbot.impl.service
 
-import org.checkerframework.checker.nullness.Opt.isPresent
 import org.springframework.stereotype.Service
 import ru.registrationbot.api.dto.AutoNotificationDTO
 import ru.registrationbot.api.service.ClientService
@@ -20,35 +19,31 @@ import javax.transaction.Transactional
 @Service
 class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                         private val repositoryClient: ClientRepository,
-                        private val repositoryHistory: HistoryRepository
+                        private val repositoryHistory: HistoryRepository,
+                        private val serviceUtils: ServiceUtils
 ) : ClientService {
 
     @Transactional
     override fun addRecording(idRecording: Long, user: UserInfo):DBServiceAnswer {
-        val client = repositoryClient.findByChatId(user.chatId)
-        val clientId =
-                    if (!client.isPresent)
-                    {
-                        val newClient = ClientsEntity(
-                            phone = user.phone,
-                            chatId = user.chatId,
-                            userName = user.userName,
-                            firstName = user.firstName,
-                            lastName = user.lastName)
-                        repositoryClient.save(newClient).id!!
-                    }
-                    else
-                    {client.get().id}
-
-        val record = repositoryTime.findById(idRecording)
-        return if (record.isPresent && TimeslotStatus.FREE == record.get().status)
+        var client = repositoryClient.findByChatId(user.chatId).orElse(null)
+        if (client == null)
+        {
+            client = ClientsEntity(
+                phone = user.phone,
+                chatId = user.chatId,
+                userName = user.userName,
+                firstName = user.firstName,
+                lastName = user.lastName)
+            repositoryClient.save(client)
+        }
+        val record = repositoryTime.findById(idRecording).orElse(null)
+        return if (record != null  && TimeslotStatus.FREE == record.status)
                 {
-                    val timeSlot = record.get()
-                    timeSlot.status = TimeslotStatus.BOOKED
-                    timeSlot.client = clientId
+                    record.status = TimeslotStatus.BOOKED
+                    record.client = client.id
 
-                    repositoryTime.save(timeSlot)
-                    addHistory(client.get(), record.get())
+                    repositoryTime.save(record)
+                    addHistory(client, record)
 
                     DBServiceAnswer.SUCCESS
                 }
@@ -59,17 +54,12 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
 
     @Transactional
     override fun deleteRecording(idRecording: Long):Int? {
-        val record = repositoryTime.findById(idRecording)
+        val record = repositoryTime.findById(idRecording).orElse(null) ?: return null
 
-        if (!record.isPresent ) //TODO нужно ли проверять статус на занятость слота?
-        {
-            return null
-        }
-
-        record.get().status = TimeslotStatus.BLOCKED
-        val clientChatId = record.get().client
-        record.get().client = null
-        repositoryTime.save(record.get())
+        record.status = TimeslotStatus.BLOCKED
+        val clientChatId = record.client
+        record.client = null
+        repositoryTime.save(record)
         return clientChatId
     }
 
@@ -79,24 +69,25 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
 
     private fun changeStatusTimeSlot(userInfo: UserInfo, status: TimeslotStatus): DBServiceAnswer {
 
-        val client = repositoryClient.findByChatId(userInfo.chatId)
+        val client = repositoryClient.findByChatId(userInfo.chatId).orElse(null)
 
-        if (!client.isPresent) {
+        if (client == null) {
             return DBServiceAnswer.CLIENT_NOT_FOUND
         }
 
-       val record = client.get().scheduleEntity
-            .stream().filter{it.id == 1L}.findFirst()
+        val record = repositoryTime.findByClient(client.id!!).orElse(null)
+        if (record == null)
+            return DBServiceAnswer.RECORD_NOT_FOUND
 
-        if (isPresent(record) && record.get().status == TimeslotStatus.FREE)
+        record.status = status
+        if (status == TimeslotStatus.FREE)
         {
-            record.get().client = null
+            record.client = null
         }
 
-        record.get().status = status
-        repositoryClient.save(client.get())
+        repositoryTime.save(record)
 
-        addHistory(client.get(), record.get())
+        addHistory(client, record)
 
         return DBServiceAnswer.SUCCESS
     }
@@ -111,7 +102,20 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
     }
 
     override fun getBookedTimeWithClient(date: LocalDate): List<AutoNotificationDTO> {
-        return listOf()
-        //repositoryClient.findByDateAndStatus(date, TimeslotStatus.BOOKED)
+
+        val forNotification = mutableListOf<AutoNotificationDTO>()
+
+        val records = repositoryTime.findByStatusAndRecordDate(TimeslotStatus.BOOKED, date)
+        val clients: Map<Int, ClientsEntity> = serviceUtils.getClientsMapByRecordsTime(records)
+
+        for (record in records)
+        {
+            forNotification.add(AutoNotificationDTO(chatId = clients.get(record.client)!!.chatId,
+                                                    recordDate = record.recordDate,
+                                                    timeStart = record.timeStart,
+                                                    timeEnd = record.timeEnd,
+                                                    firstName =  clients.get(record.client)!!.firstName))
+        }
+        return forNotification
     }
 }
