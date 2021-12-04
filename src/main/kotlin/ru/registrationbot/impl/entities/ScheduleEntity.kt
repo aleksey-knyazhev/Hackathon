@@ -21,7 +21,7 @@ data class ScheduleEntity (
     @Enumerated(EnumType.STRING)
     var status: TimeslotStatus,
 
-    var client: Int? = null
+    var client: Int? = null,
 )
 
 
