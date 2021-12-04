@@ -8,6 +8,5 @@ class UserInfo(message: Message){
     val userName: String = message.chat.userName
     val firstName: String? =  message.chat.firstName
     val lastName: String? = message.chat.lastName
-//todo телефоны нужно проверить те ли?
 
 }
