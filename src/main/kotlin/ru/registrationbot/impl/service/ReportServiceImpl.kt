@@ -20,6 +20,9 @@ class ReportServiceImpl(
     }
 
     override fun getConfirmedRecording(): List<String> {
-        TODO("Not yet implemented")
+        val date = LocalDate.now().plusDays(1)
+        val report = clientRepository.findByDateAndStatus(date, TimeslotStatus.CONFIRMED)
+
+        return listOf(String())
     }
 }
