@@ -2,23 +2,21 @@ package ru.registrationbot
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.repository.CrudRepository
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
-import ru.registrationbot.api.repository.ScheduleRepository
-import ru.registrationbot.impl.entities.HistoryEntity
-import ru.registrationbot.impl.entities.ScheduleEntity
-import ru.registrationbot.impl.service.ClientServiceImpl
-import ru.registrationbot.impl.service.ScheduleServiceImpl
+import ru.registrationbot.api.dto.UserInfo
+import ru.registrationbot.api.service.ClientService
+import ru.registrationbot.api.service.SchedulerService
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @EnableScheduling
@@ -35,10 +33,13 @@ class RegistrationBot : TelegramLongPollingBot() {
 
     //видимость chatid на весь класс
     var chatId = 1L
+    var date = ""
+    var time = ""
+
     @Autowired
-    lateinit var scheduleService: ScheduleServiceImpl
+    lateinit var scheduleService: SchedulerService
     @Autowired
-    lateinit var clientSetvice: ClientServiceImpl
+    lateinit var clientSetvice: ClientService
     override fun getBotToken(): String = token
 
     override fun getBotUsername(): String = botName
@@ -48,8 +49,6 @@ class RegistrationBot : TelegramLongPollingBot() {
             val message = update.message
             chatId = message.chatId
             val buttons: MutableList<String> = mutableListOf("Главное меню")
-            val date: String
-            val time: String
             val responseText = if (message.hasText()) {
                 val messageText = message.text
                 val text = if (chatId == doctor) {
@@ -69,7 +68,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                         }
                         messageText.matches(Regex("\\d{2}:\\d{2} \\d{2}:\\d{2}")) -> {
                             time = messageText
-                            //telegramBotService.openRecording(LocalDate.parse(date), time)
+                            scheduleService.openRecording(LocalDate.parse(date), time)
                             "Запись открыта успешно"
                         }
                         messageText.startsWith("Показать список подтвержденных записей на завтра") -> {
@@ -124,17 +123,16 @@ class RegistrationBot : TelegramLongPollingBot() {
                 }
                 when {
                     messageText.startsWith("Показать свободное время") -> {
-                        //buttons.addAll(telegramBotService.getDates())
-                        buttons.addAll(listOf("10-05-2021", "08-06-2021", "22-12-2021"))
+                        scheduleService.getDates()
+                            .forEach { buttons.add(it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()) }
                         "Выберите дату"
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
-                        //buttons.addAll(telegramBotService.getTimesForDate(LocalDate.parse(messageText)))
-                        buttons.addAll(listOf("1 10:00", "34 15:00", "245 17:30"))
+                        buttons.addAll(scheduleService.getTimesForDate(LocalDate.parse(messageText, DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                         "Выберите свободное время для записи"
                     }
-                    messageText.matches(Regex("\\d{2}:\\d{2}")) -> {
-                        //telegramBotService.addRecording(messageText.split("")[0], UserInfo(message))
+                    messageText.matches(Regex("\\d+ \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
+                        clientSetvice.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
                         "Запись создана успешно"
                     }
                     else -> text
