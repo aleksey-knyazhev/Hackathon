@@ -1,5 +1,6 @@
 package ru.registrationbot.impl.service
 
+import org.checkerframework.checker.nullness.Opt.isPresent
 import org.springframework.stereotype.Service
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.enums.DBServiceAnswer
@@ -11,6 +12,7 @@ import ru.registrationbot.api.repository.HistoryRepository
 import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.impl.entities.HistoryEntity
 import ru.registrationbot.impl.entities.ScheduleEntity
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
@@ -45,7 +47,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                     timeSlot.client = clientId
 
                     repositoryTime.save(timeSlot)
-                    addHistory(clientId!!, timeSlot)
+                    addHistory(client.get(), record.get())
 
                     DBServiceAnswer.SUCCESS
                 }
@@ -70,11 +72,11 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         return clientChatId
     }
 
-    override fun confirmRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED)
+    override fun confirmRecording(userInfo: UserInfo, timeSlotId: Long) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED, timeSlotId)
 
-    override fun cancelRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.FREE)
+    override fun cancelRecording(userInfo: UserInfo, timeSlotId: Long) = changeStatusTimeSlot(userInfo, TimeslotStatus.FREE, timeSlotId)
 
-    private fun changeStatusTimeSlot(userInfo: UserInfo, status: TimeslotStatus): DBServiceAnswer {
+    private fun changeStatusTimeSlot(userInfo: UserInfo, status: TimeslotStatus,  timeSlotId: Long): DBServiceAnswer {
 
         val client = repositoryClient.findByChatId(userInfo.chatId)
 
@@ -82,29 +84,32 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
             return DBServiceAnswer.CLIENT_NOT_FOUND
         }
 
-        val record = repositoryTime.findByClient(client.get().id!!)
-        if (!record.isPresent)
-            return DBServiceAnswer.RECORD_NOT_FOUND
+       val record = client.get().scheduleEntity
+            .stream().filter{it.id == timeSlotId}.findFirst()
 
-        val timeSlot = record.get()
-        timeSlot.status = status
-        if (status == TimeslotStatus.FREE)
+        if (isPresent(record) && record.get().status == TimeslotStatus.FREE)
         {
-            timeSlot.client = null
+            record.get().client = null
         }
-        repositoryTime.save(timeSlot)
 
-        addHistory(client.get().id!!, timeSlot)
+        record.get().status = status
+        repositoryClient.save(client.get())
+
+        addHistory(client.get(), record.get())
 
         return DBServiceAnswer.SUCCESS
     }
 
-    private fun addHistory(idClient: Int, timeSlot: ScheduleEntity) {
+    private fun addHistory(client: ClientsEntity, record: ScheduleEntity) {
 
         repositoryHistory.save(
-            HistoryEntity(client = idClient, date = LocalDateTime.now(),
-                action = timeSlot.status.name ,
-                description = "${timeSlot.recordDate} c ${timeSlot.timeStart} до ${timeSlot.timeEnd}"))
+            HistoryEntity(client = client.id!!, date = LocalDateTime.now(),
+                action = record.status.name ,
+                description = "${record.recordDate} c ${record.timeStart} до ${record.timeEnd}"))
 
+    }
+
+    override fun getBookedTimeWithClient(date: LocalDate): List<ClientsEntity> {
+        return repositoryClient.findByDateAndStatus(date, TimeslotStatus.BOOKED)
     }
 }

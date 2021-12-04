@@ -23,6 +23,10 @@ data class ClientsEntity (
     var firstName: String? = null,
 
     @Column(name = "last_name")
-    var lastName: String? = null
+    var lastName: String? = null,
+
+    @OneToMany(targetEntity = ScheduleEntity::class)
+    @JoinColumn(name = "client")
+    var scheduleEntity: List<ScheduleEntity> = mutableListOf()
 )
 

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController
 import org.telegram.telegrambots.meta.api.objects.Message
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.dto.UserInfo
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
 
@@ -43,19 +45,26 @@ class StubController(@Autowired private var service: ClientService) {
     }
 
     //idUser - id записи таблицы Client
-    @GetMapping(value = ["/cancel/{idUser}"])
-    fun cancelRecording(@PathVariable idUser: Long): ResponseEntity<Any> {
+    @GetMapping(value = ["/cancel/{idUser}/{timeslotId}"])
+    fun cancelRecording(@PathVariable idUser: Long, @PathVariable timeSlotId: Long): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.cancelRecording(UserInfo(getMessage(idUser))))
+            .body(service.cancelRecording(UserInfo(getMessage(idUser)), timeSlotId))
 
     }
 
     //idUser - id записи таблицы Client
-    @GetMapping(value = ["/confirm/{idUser}"])
-    fun confirmRecord(@PathVariable idUser: Long): ResponseEntity<Any> {
+    @GetMapping(value = ["/confirm/{idUser}/{timeslotId}"])
+    fun confirmRecord(@PathVariable idUser: Long, @PathVariable timeSlotId: Long): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.confirmRecording(UserInfo(getMessage(idUser))))
+            .body(service.confirmRecording(UserInfo(getMessage(idUser)), timeSlotId))
+    }
 
+    //idUser - id записи таблицы Client
+    @GetMapping(value = ["/booked/{data}"])
+    fun getBookedTimeWithClient(@PathVariable data: String): ResponseEntity<Any> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(service.getBookedTimeWithClient(LocalDate.parse(data, formatter)))
     }
 
 
