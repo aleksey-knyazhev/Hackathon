@@ -10,7 +10,7 @@ interface ManagerService {
      * idRecording - id записи
      * в качестве элементов списка можно возвращать например UserInfo, но обязательно нужно передавать на фронт id пользователя
      */
-    fun getAllUsers():List<ClientDto>
+    fun getAllUsers()
 
     /**
      * Метод для удаления пользователя
@@ -24,6 +24,6 @@ interface ManagerService {
      * Метод для получения истории по клиенту
      * idUser - id клиента
      */
-    fun getHistory(idUser: Long):List<RecordDto>
+    fun getHistory(idUser: Long)
 
 }

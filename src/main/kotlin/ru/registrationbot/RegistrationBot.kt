@@ -2,6 +2,7 @@ package ru.registrationbot
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Lazy
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -47,6 +48,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     lateinit var reportService: ReportService
 
     @Autowired
+    @Lazy
     lateinit var managerService: ManagerService
 
     override fun getBotToken(): String = token
@@ -89,7 +91,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                             "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
                         }
                         messageText.startsWith("Отменить") -> {
-                            clientService.deleteRecording(messageText.split("")[1].toLong())
+                            clientService.deleteRecording(messageText.split(" ")[1].toLong())
                             "Запись удалена"
                         }
                         messageText.startsWith("Показать список клиентов") -> {
@@ -99,12 +101,12 @@ class RegistrationBot : TelegramLongPollingBot() {
                                     "id - номер пользователя"
                         }
                         messageText.startsWith("История") -> {
-                            managerService.getHistory(messageText.split("")[1].toLong())
+                            managerService.getHistory(messageText.split(" ")[1].toLong())
                             "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
                                     "id - номер пользователя"
                         }
                         messageText.startsWith("Удалить") -> {
-                            managerService.deleteUserInfo(messageText.split("")[1].toLong())
+                            managerService.deleteUserInfo(messageText.split(" ")[1].toLong())
                             "Пользователь и его записи удалены"
                         }
                         messageText.startsWith("Главное меню") -> {
@@ -173,6 +175,9 @@ class RegistrationBot : TelegramLongPollingBot() {
         return markup
     }
 
+    /**
+     * Для отправки клиенту сообщения для подтверждения записи
+     */
     private fun requestConfirmation(chatId: Long, date: String, time: String) {
         val buttons: List<String> = listOf(
             "Главное меню",
@@ -186,7 +191,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     /**
      * Для отправки уведомления клиенту об отмененной записи
      */
-    private fun sendCancelNotificationToClient(chatId: Long, time: String) {
+    fun sendCancelNotificationToClient(chatId: Long, time: String) {
         val buttons: List<String> = listOf("Главное меню")
         val text = "Извините, Ваша запись на завтра в $time отменена"
         sendNotification(chatId, text, buttons)
@@ -195,7 +200,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     /**
      * Для отправки уведомления клиенту об удалении его данных из БД
      */
-    private fun sendDeleteNotification(chatId: Long) {
+    fun sendDeleteNotification(chatId: Long) {
         val buttons: List<String> = listOf("Главное меню")
         val text = "Все Ваши записи были удалены"
         sendNotification(chatId, text, buttons)
@@ -204,7 +209,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     /**
      * Для отправки уведомления менеджеру о отмене записи клиентом
      */
-    private fun sendCancelNotificationToMng(userName: String, time: String) {
+    fun sendCancelNotificationToMng(userName: String, time: String) {
         val buttons: List<String> = listOf("Главное меню")
         val text = "Клиент $userName отменил запись на завтра в $time"
         sendNotification(manager, text, buttons)
@@ -213,7 +218,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     /**
      * Для отправки списка записей/истории/списка клиентов менеджеру
      */
-    private fun sendRecord(records: List<String>) {
+    fun sendRecord(records: List<String>) {
         val buttons: List<String> = listOf("Главное меню")
         sendNotification(manager, records.joinToString("\n"), buttons)
     }
