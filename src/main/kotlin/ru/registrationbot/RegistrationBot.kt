@@ -1,16 +1,22 @@
 package ru.registrationbot
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.CrudRepository
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
+import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.impl.entities.HistoryEntity
 import ru.registrationbot.impl.entities.ScheduleEntity
+import ru.registrationbot.impl.service.ClientServiceImpl
+import ru.registrationbot.impl.service.ScheduleServiceImpl
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -29,6 +35,10 @@ class RegistrationBot : TelegramLongPollingBot() {
 
     //видимость chatid на весь класс
     var chatId = 1L
+    @Autowired
+    lateinit var scheduleService: ScheduleServiceImpl
+    @Autowired
+    lateinit var clientSetvice: ClientServiceImpl
     override fun getBotToken(): String = token
 
     override fun getBotUsername(): String = botName
@@ -176,18 +186,16 @@ class RegistrationBot : TelegramLongPollingBot() {
         sendNotification(chatId, text, buttons)
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
-    private fun sendNotificationByShedule(){
-        val historyData = mutableListOf<HistoryEntity>()
+    @Scheduled(cron = "7 0 0 * * *")
+    private fun sendNotificationBySchedule(){
         val currentDate =  LocalDateTime.now()
-        for(history in historyData){
-            val date = history.date
+        for(date in scheduleService.getDates()){
             val duration = Duration.between(currentDate, date)
             if(duration.toDays() == 1L){
-                val schedule = mutableListOf<ScheduleEntity>()
-                for(sc in schedule)
-                //Пока непонятно как передавать chatId и time
-                    requestConfirmation(chatId,history.date.toString(),sc.timeStart.toString())
+                for( client in clientSetvice.getBookedTimeWithClient(date)) {
+                    for(time in client.scheduleEntity)
+                    requestConfirmation(client.chatId, date.toString(), time.timeStart.toString())
+                }
             }
         }
     }
