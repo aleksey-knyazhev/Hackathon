@@ -7,8 +7,8 @@ import ru.registrationbot.impl.entities.ScheduleEntity
 import ru.registrationbot.api.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ScheduleRepository
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
-
 
 @Service
 class ScheduleServiceImpl(
@@ -46,6 +46,6 @@ class ScheduleServiceImpl(
 
     override fun getTimesForDate(date: LocalDate) = scheduleRepository
         .findByStatusAndRecordDate(TimeslotStatus.FREE, date)
-        .filter { it.timeStart > LocalTime.now() }
-        .map { "${it.timeStart} ${it.timeEnd}" }.sorted()
+        .filter { LocalDateTime.of(date, it.timeStart) > LocalDateTime.now() }
+        .map { "${it.id} ${it.timeStart}-${it.timeEnd}" }.sorted()
 }
