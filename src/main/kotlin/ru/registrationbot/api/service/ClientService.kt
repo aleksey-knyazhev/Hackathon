@@ -1,5 +1,6 @@
 package ru.registrationbot.api.service
 
+import ru.registrationbot.api.dto.AutoNotificationDTO
 import ru.registrationbot.api.dto.UserInfo
 import ru.registrationbot.api.enums.DBServiceAnswer
 import ru.registrationbot.impl.entities.ClientsEntity
@@ -30,19 +31,19 @@ interface ClientService {
      * Ищем запись на завтрашний день для указанного пользователя и проставляем соответствующий статус
      */
     //
-    fun confirmRecording(userInfo: UserInfo, timeSlotId: Long): DBServiceAnswer
+    fun confirmRecording(userInfo: UserInfo): DBServiceAnswer
 
     /**
      * Метод для удаления записи
      * userInfo - информация о клиенте
      * Ищем запись на завтрашний день для указанного пользователя и освобождаем ее
      */
-    fun cancelRecording(userInfo: UserInfo, timeSlotId: Long): DBServiceAnswer
+    fun cancelRecording(userInfo: UserInfo): DBServiceAnswer
 
     /**
      * Метод для получения списка забронированных слотов, chatId и имени клиента
      *  для конкретной даты (для автооповещения)
      */
-    fun getBookedTimeWithClient(date: LocalDate):List<ClientsEntity>
+    fun getBookedTimeWithClient(date: LocalDate):List<AutoNotificationDTO>
 
 }
