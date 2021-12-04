@@ -3,7 +3,7 @@ create table clients
     id serial
         constraint clients_pk
             primary key,
-    phone varchar(11) not null,
+    phone varchar(11),
     chat_id numeric(10,0) not null,
     user_name varchar(100) not null,
     first_name varchar(100),
