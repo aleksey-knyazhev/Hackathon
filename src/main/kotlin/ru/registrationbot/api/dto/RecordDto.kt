@@ -8,4 +8,8 @@ class RecordDto(
     var date: LocalDateTime?,
     var action: String?,
     var description: String?
-)
+) {
+    override fun toString(): String {
+        return "$date $action $description)"
+    }
+}

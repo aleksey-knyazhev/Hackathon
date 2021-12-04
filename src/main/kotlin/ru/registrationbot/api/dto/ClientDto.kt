@@ -7,4 +7,8 @@ class ClientDto(
     val userName: String?,
     val firstName: String?,
     val lastName: String?
-)
+) {
+    override fun toString(): String {
+        return "$idRecording $firstName $lastName @$userName $phone"
+    }
+}
