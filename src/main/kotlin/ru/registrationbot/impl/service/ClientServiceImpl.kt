@@ -2,6 +2,7 @@ package ru.registrationbot.impl.service
 
 import org.checkerframework.checker.nullness.Opt.isPresent
 import org.springframework.stereotype.Service
+import ru.registrationbot.api.dto.AutoNotificationDTO
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.enums.DBServiceAnswer
 import ru.registrationbot.api.dto.UserInfo
@@ -72,11 +73,11 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         return clientChatId
     }
 
-    override fun confirmRecording(userInfo: UserInfo, timeSlotId: Long) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED, timeSlotId)
+    override fun confirmRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED)
 
-    override fun cancelRecording(userInfo: UserInfo, timeSlotId: Long) = changeStatusTimeSlot(userInfo, TimeslotStatus.FREE, timeSlotId)
+    override fun cancelRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.FREE)
 
-    private fun changeStatusTimeSlot(userInfo: UserInfo, status: TimeslotStatus,  timeSlotId: Long): DBServiceAnswer {
+    private fun changeStatusTimeSlot(userInfo: UserInfo, status: TimeslotStatus): DBServiceAnswer {
 
         val client = repositoryClient.findByChatId(userInfo.chatId)
 
@@ -85,7 +86,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         }
 
        val record = client.get().scheduleEntity
-            .stream().filter{it.id == timeSlotId}.findFirst()
+            .stream().filter{it.id == 1L}.findFirst()
 
         if (isPresent(record) && record.get().status == TimeslotStatus.FREE)
         {
@@ -109,7 +110,8 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
 
     }
 
-    override fun getBookedTimeWithClient(date: LocalDate): List<ClientsEntity> {
-        return repositoryClient.findByDateAndStatus(date, TimeslotStatus.BOOKED)
+    override fun getBookedTimeWithClient(date: LocalDate): List<AutoNotificationDTO> {
+        return listOf()
+        //repositoryClient.findByDateAndStatus(date, TimeslotStatus.BOOKED)
     }
 }
