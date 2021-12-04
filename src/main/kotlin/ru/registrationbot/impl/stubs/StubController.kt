@@ -49,7 +49,7 @@ class StubController(@Autowired private var service: ClientService, @Autowired p
     @GetMapping(value = ["/cancel/{idUser}/{timeslotId}"])
     fun cancelRecording(@PathVariable idUser: Long, @PathVariable timeSlotId: Long): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.cancelRecording(UserInfo(getMessage(idUser)), timeSlotId))
+            .body(service.cancelRecording(UserInfo(getMessage(idUser))))
 
     }
 
@@ -57,7 +57,7 @@ class StubController(@Autowired private var service: ClientService, @Autowired p
     @GetMapping(value = ["/confirm/{idUser}/{timeslotId}"])
     fun confirmRecord(@PathVariable idUser: Long, @PathVariable timeSlotId: Long): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.confirmRecording(UserInfo(getMessage(idUser)), timeSlotId))
+            .body(service.confirmRecording(UserInfo(getMessage(idUser))))
     }
 
     //idUser - id записи таблицы Client
