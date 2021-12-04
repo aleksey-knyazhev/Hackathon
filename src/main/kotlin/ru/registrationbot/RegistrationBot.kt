@@ -12,12 +12,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 import ru.registrationbot.api.dto.UserInfo
 import ru.registrationbot.api.service.ClientService
+import ru.registrationbot.api.service.ManagerService
+import ru.registrationbot.api.service.ReportService
 import ru.registrationbot.api.service.SchedulerService
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 
 @EnableScheduling
 @Service
@@ -29,7 +30,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     private val token: String = ""
 
     @Value("\${telegram.doctor.chatId}")
-    private val doctor: Long = 0
+    private val manager: Long = 0
 
     //видимость chatid на весь класс
     var chatId = 1L
@@ -38,8 +39,16 @@ class RegistrationBot : TelegramLongPollingBot() {
 
     @Autowired
     lateinit var scheduleService: SchedulerService
+
     @Autowired
-    lateinit var clientSetvice: ClientService
+    lateinit var clientService: ClientService
+
+    @Autowired
+    lateinit var reportService: ReportService
+
+    @Autowired
+    lateinit var managerService: ManagerService
+
     override fun getBotToken(): String = token
 
     override fun getBotUsername(): String = botName
@@ -51,7 +60,7 @@ class RegistrationBot : TelegramLongPollingBot() {
             val buttons: MutableList<String> = mutableListOf("Главное меню")
             val responseText = if (message.hasText()) {
                 val messageText = message.text
-                val text = if (chatId == doctor) {
+                val text = if (chatId == manager) {
                     when {
                         messageText == "/start" -> {
                             buttons.add("Открыть запись")
@@ -61,10 +70,10 @@ class RegistrationBot : TelegramLongPollingBot() {
                             buttons.add("Показать список клиентов")
                             "Здравствуй, хозяин!"
                         }
-                        messageText.startsWith("Открыть запись") -> "Введите дату в формате ГГГГ-ММ-ДД\nНапример: 2021-10-08"
+                        messageText.startsWith("Открыть запись") -> "Введите дату в формате ГГГГ-ММ-ДД\nНапример: 2022-10-08"
                         messageText.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) -> {
                             date = messageText
-                            "Введите время первой и последней записи через пробел в формате hh:mm\nНапример: 10:00 18:30"
+                            "Введите время первой и последней записи через пробел в формате hh:mm\nНапример: 10:00 18:00"
                         }
                         messageText.matches(Regex("\\d{2}:\\d{2} \\d{2}:\\d{2}")) -> {
                             time = messageText
@@ -72,29 +81,30 @@ class RegistrationBot : TelegramLongPollingBot() {
                             "Запись открыта успешно"
                         }
                         messageText.startsWith("Показать список подтвержденных записей на завтра") -> {
-                            //telegramBotService.getConfirmedRecording()
+                            reportService.getConfirmedRecording()
                             "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
                         }
                         messageText.startsWith("Показать список неподтвержденных записей на завтра") -> {
-                            //telegramBotService.getUnconfirmedRecording()
+                            reportService.getUnconfirmedRecording()
                             "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
                         }
                         messageText.startsWith("Отменить") -> {
-                            //telegramBotService.deleteRecording(messageText.replace(messageText.split("")[1])
+                            clientService.deleteRecording(messageText.split("")[1].toLong())
                             "Запись удалена"
                         }
                         messageText.startsWith("Показать список клиентов") -> {
-                            //telegramBotService.getAllUsers()
+                            managerService.getAllUsers()
                             "Для получения истории по клиенту введите команду \"История id\"\n" +
                                     "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
                                     "id - номер пользователя"
                         }
                         messageText.startsWith("История") -> {
-                            //telegramBotService.getHistory(messageText.split("")[1])
-                            "Вернуться в главное меню /start"
+                            managerService.getHistory(messageText.split("")[1].toLong())
+                            "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
+                                    "id - номер пользователя"
                         }
                         messageText.startsWith("Удалить") -> {
-                            //telegramBotService.deleteUserInfo(messageText.split("")[1])
+                            managerService.deleteUserInfo(messageText.split("")[1].toLong())
                             "Пользователь и его записи удалены"
                         }
                         messageText.startsWith("Главное меню") -> {
@@ -111,11 +121,11 @@ class RegistrationBot : TelegramLongPollingBot() {
                             "Добро пожаловать!"
                         }
                         messageText.startsWith("Подтвердить") -> {
-                            //telegramBotService.confirmRecording(UserInfo(message))
+                            clientService.confirmRecording(UserInfo(message))
                             "Запись успешно подтверждена"
                         }
                         messageText.startsWith("Отменить запись") -> {
-                            //telegramBotService.cancelRecording(UserInfo(message))
+                            clientService.cancelRecording(UserInfo(message))
                             "Запись отменена"
                         }
                         else -> "Вы написали: *$messageText*"
@@ -128,11 +138,12 @@ class RegistrationBot : TelegramLongPollingBot() {
                         "Выберите дату"
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
-                        buttons.addAll(scheduleService.getTimesForDate(LocalDate.parse(messageText, DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                        buttons.addAll(scheduleService.getTimesForDate(LocalDate.parse(messageText,
+                            DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                         "Выберите свободное время для записи"
                     }
                     messageText.matches(Regex("\\d+ \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
-                        clientSetvice.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
+                        clientService.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
                         "Запись создана успешно"
                     }
                     else -> text
@@ -172,25 +183,48 @@ class RegistrationBot : TelegramLongPollingBot() {
         sendNotification(chatId, text, buttons)
     }
 
-    private fun sendCancelNotification(chatId: Long, time: String) {
+    /**
+     * Для отправки уведомления клиенту об отмененной записи
+     */
+    private fun sendCancelNotificationToClient(chatId: Long, time: String) {
         val buttons: List<String> = listOf("Главное меню")
         val text = "Извините, Ваша запись на завтра в $time отменена"
         sendNotification(chatId, text, buttons)
     }
 
+    /**
+     * Для отправки уведомления клиенту об удалении его данных из БД
+     */
     private fun sendDeleteNotification(chatId: Long) {
         val buttons: List<String> = listOf("Главное меню")
         val text = "Все Ваши записи были удалены"
         sendNotification(chatId, text, buttons)
     }
 
+    /**
+     * Для отправки уведомления менеджеру о отмене записи клиентом
+     */
+    private fun sendCancelNotificationToMng(userName: String, time: String) {
+        val buttons: List<String> = listOf("Главное меню")
+        val text = "Клиент $userName отменил запись на завтра в $time"
+        sendNotification(manager, text, buttons)
+    }
+
+    /**
+     * Для отправки списка записей/истории/списка клиентов менеджеру
+     */
+    private fun sendRecord(records: List<String>) {
+        val buttons: List<String> = listOf("Главное меню")
+        sendNotification(manager, records.joinToString("\n"), buttons)
+    }
+
     @Scheduled(cron = "7 0 0 * * *")
-    private fun sendNotificationBySchedule(){
-        val currentDate =  LocalDateTime.now()
-        for(date in scheduleService.getDates()){
+    private fun sendNotificationBySchedule() {
+        val currentDate = LocalDateTime.now()
+        for (date in scheduleService.getDates()) {
             val duration = Duration.between(currentDate, date)
-            if(duration.toDays() == 1L){
-                for(client in clientSetvice.getBookedTimeWithClient(date)) {
+            if (duration.toDays() == 1L) {
+                for (client in clientService.getBookedTimeWithClient(date)) {
                     requestConfirmation(client.chatId, date.toString(), client.timeStart.toString())
                 }
             }
