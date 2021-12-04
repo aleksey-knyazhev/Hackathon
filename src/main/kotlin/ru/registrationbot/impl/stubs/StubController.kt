@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.RestController
 import org.telegram.telegrambots.meta.api.objects.Message
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.dto.UserInfo
+import ru.registrationbot.api.service.ReportService
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
 
 @RestController
-class StubController(@Autowired private var service: ClientService) {
+class StubController(@Autowired private var service: ClientService, @Autowired private var reportService: ReportService) {
 
     //idTimeSlot - id записи таблицы Scheduler с проверкой добавления клиента
     @GetMapping(value = ["/add/{idTimeSlot}"])
@@ -48,7 +49,7 @@ class StubController(@Autowired private var service: ClientService) {
     @GetMapping(value = ["/cancel/{idUser}/{timeslotId}"])
     fun cancelRecording(@PathVariable idUser: Long, @PathVariable timeSlotId: Long): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.cancelRecording(UserInfo(getMessage(idUser)), timeSlotId))
+            .body(service.cancelRecording(UserInfo(getMessage(idUser))))
 
     }
 
@@ -56,7 +57,7 @@ class StubController(@Autowired private var service: ClientService) {
     @GetMapping(value = ["/confirm/{idUser}/{timeslotId}"])
     fun confirmRecord(@PathVariable idUser: Long, @PathVariable timeSlotId: Long): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.confirmRecording(UserInfo(getMessage(idUser)), timeSlotId))
+            .body(service.confirmRecording(UserInfo(getMessage(idUser))))
     }
 
     //idUser - id записи таблицы Client
@@ -79,5 +80,10 @@ class StubController(@Autowired private var service: ClientService) {
         val mapper = jacksonObjectMapper()
 
         return mapper.readValue(json)
+    }
+
+    @GetMapping(value = ["/report/unconfirmed"])
+    fun getUnconfirmedRecording(): Any {
+        return reportService.getUnconfirmedRecording()
     }
 }

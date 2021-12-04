@@ -190,9 +190,8 @@ class RegistrationBot : TelegramLongPollingBot() {
         for(date in scheduleService.getDates()){
             val duration = Duration.between(currentDate, date)
             if(duration.toDays() == 1L){
-                for( client in clientSetvice.getBookedTimeWithClient(date)) {
-                    for(time in client.scheduleEntity)
-                    requestConfirmation(client.chatId, date.toString(), time.timeStart.toString())
+                for(client in clientSetvice.getBookedTimeWithClient(date)) {
+                    requestConfirmation(client.chatId, date.toString(), client.timeStart.toString())
                 }
             }
         }
