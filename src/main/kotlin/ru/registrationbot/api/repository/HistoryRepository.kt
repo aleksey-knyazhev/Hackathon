@@ -6,4 +6,7 @@ import ru.registrationbot.impl.entities.HistoryEntity
 
 @Repository
 interface HistoryRepository: CrudRepository<HistoryEntity, Long> {
+
+    fun findByClient(clientId: Int): List <HistoryEntity>
+
 }
