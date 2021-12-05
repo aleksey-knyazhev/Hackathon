@@ -58,5 +58,5 @@ interface ClientService {
     /**
      * Метод для получения списка записей клиента на даты, начиная с текущей
      */
-    fun getClientWithActualRecords(userInfo: UserInfo): List<TimeSlotDTO>
+    fun getClientWithActualRecords(userInfo: UserInfo)
 }

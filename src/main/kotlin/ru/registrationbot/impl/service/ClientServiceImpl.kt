@@ -160,10 +160,10 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         return forNotification
     }
 
-    override fun getClientWithActualRecords(userInfo: UserInfo): List<TimeSlotDTO> {
+    override fun getClientWithActualRecords(userInfo: UserInfo) {
 
         val client = repositoryClient.findByChatId(userInfo.chatId).orElse(null)
-        ?: return listOf()
+        ?: return
 
         val forNotification = mutableListOf<String>()
 
@@ -177,7 +177,10 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                 timeEnd = record.timeEnd,
                 firstName =  client.firstName).toString())
         }
-        registrationBot.sendRecordToClient(userInfo.chatId, forNotification)
-        return listOf()
+        if (forNotification.isEmpty()) {
+            registrationBot.sendNotificationToMng("Записей не найдено")
+        } else {
+            registrationBot.sendRecordToClient(userInfo.chatId, forNotification)
+        }
     }
 }

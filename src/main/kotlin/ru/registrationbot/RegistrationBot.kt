@@ -159,10 +159,16 @@ class RegistrationBot : TelegramLongPollingBot() {
                         val action = clientService.addRecording(LocalDate.parse(dateTime[0],
                             DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                             LocalTime.parse(dateTime[1].split("-")[0]), UserInfo(message))
-                        if (action == DBServiceAnswer.SUCCESS) {
-                            "Запись создана успешно"
-                        } else {
-                            "Что-то пошло не так. Попробуйте снова"
+                        when (action) {
+                            DBServiceAnswer.SUCCESS -> {
+                                "Запись создана успешно"
+                            }
+                            DBServiceAnswer.RECORD_ALREADY_EXIST -> {
+                                "Вы уже записаны на эту дату"
+                            }
+                            else -> {
+                                "Что-то пошло не так. Попробуйте снова"
+                            }
                         }
                     }
                     messageText.startsWith("Подтвердить") -> {
