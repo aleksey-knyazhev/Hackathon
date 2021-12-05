@@ -74,7 +74,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                             buttons.add("Показать список клиентов")
                             "Здравствуй, хозяин!"
                         }
-                        messageText.startsWith("Открыть запись") -> "Введите дату в формате ГГГГ-ММ-ДД\nНапример: 2022-10-08"
+                        messageText.startsWith("Открыть запись") -> "Введите дату в формате ГГГГ-ММ-ДД\nНапример: 2021-12-01"
                         messageText.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) -> {
                             date = messageText
                             "Введите время первой и последней записи через пробел в формате hh:mm\nНапример: 10:00 18:00"
