@@ -288,9 +288,9 @@ class RegistrationBot : TelegramLongPollingBot() {
 
     @Scheduled(cron = "0 13 14 * * *")
     private fun sendNotificationBySchedule() {
-        val currentDate = LocalDate.now()
+        val currentDate = LocalDate.now().atStartOfDay()
         for (date in scheduleService.getDates()) {
-            val duration = Duration.between(currentDate, date)
+            val duration = Duration.between(currentDate, date.atStartOfDay())
             if (duration.toDays() <= 1L)  {
                 for (client in clientService.getBookedTimeWithClient(date)) {
                     requestConfirmation(client.chatId, date.toString(), client.timeStart.toString())
