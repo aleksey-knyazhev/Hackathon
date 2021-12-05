@@ -227,9 +227,9 @@ class RegistrationBot : TelegramLongPollingBot() {
         sendNotification(manager, records.joinToString("\n"), buttons)
     }
 
-    @Scheduled(cron = "7 0 0 * * *")
+    @Scheduled(cron = "0 0 7 * * *")
     private fun sendNotificationBySchedule() {
-        val currentDate = LocalDateTime.now()
+        val currentDate = LocalDate.now()
         for (date in scheduleService.getDates()) {
             val duration = Duration.between(currentDate, date)
             if (duration.toDays() <= 1L)  {
