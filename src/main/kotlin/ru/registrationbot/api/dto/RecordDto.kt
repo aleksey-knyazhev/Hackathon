@@ -10,6 +10,6 @@ class RecordDto(
     var description: String?
 ) {
     override fun toString(): String {
-        return "$date ${action.orEmpty()} ${description.orEmpty()}}."
+        return "$date ${action.orEmpty()} ${description.orEmpty()}"
     }
 }
