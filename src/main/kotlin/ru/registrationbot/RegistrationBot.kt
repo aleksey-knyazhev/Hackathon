@@ -232,7 +232,7 @@ class RegistrationBot : TelegramLongPollingBot() {
         val currentDate = LocalDateTime.now()
         for (date in scheduleService.getDates()) {
             val duration = Duration.between(currentDate, date)
-            if (duration.toDays() == 1L) {
+            if (duration.toDays() <= 1L)  {
                 for (client in clientService.getBookedTimeWithClient(date)) {
                     requestConfirmation(client.chatId, date.toString(), client.timeStart.toString())
                 }
