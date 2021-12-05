@@ -5,6 +5,7 @@ import ru.registrationbot.api.dto.UserInfo
 import ru.registrationbot.api.enums.DBServiceAnswer
 import ru.registrationbot.impl.entities.ClientsEntity
 import java.time.LocalDate
+import java.time.LocalTime
 
 interface ClientService {
 
@@ -14,7 +15,7 @@ interface ClientService {
      * user - данные о клиенте
      */
     //true- успех, false- ошибка
-    fun addRecording(idRecording: Long, user: UserInfo): DBServiceAnswer
+    fun addRecording(date:LocalDate, time: LocalTime, user: UserInfo): DBServiceAnswer
 
     /**
      * Метод для удаления записи

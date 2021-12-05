@@ -9,6 +9,7 @@ import ru.registrationbot.api.repository.ScheduleRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class ScheduleServiceImpl(
@@ -47,5 +48,5 @@ class ScheduleServiceImpl(
     override fun getTimesForDate(date: LocalDate) = scheduleRepository
         .findByStatusAndRecordDate(TimeslotStatus.FREE, date)
         .filter { LocalDateTime.of(date, it.timeStart) > LocalDateTime.now() }
-        .map { "${it.id} ${it.timeStart}-${it.timeEnd}" }.sorted()
+        .map { "${it.recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))}  ${it.timeStart}-${it.timeEnd}" }.sorted()
 }
