@@ -8,4 +8,8 @@ class TimeSlotDTO(var idRecording: Long,
                   var timeStart: LocalTime,
                   var timeEnd: LocalTime,
                   var firstName: String?
-)
+) {
+    override fun toString(): String {
+        return "$idRecording\t\t$recordDate\t$timeStart-$timeEnd"
+    }
+}

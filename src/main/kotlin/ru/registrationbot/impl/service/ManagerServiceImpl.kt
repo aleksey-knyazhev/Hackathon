@@ -25,7 +25,7 @@ class ManagerServiceImpl(
     lateinit var registrationBot: RegistrationBot
 
     @Transactional
-    override fun getAllUsers() = registrationBot.sendRecord(clientRepository
+    override fun getAllUsers() = registrationBot.sendRecordToMng(clientRepository
         .findAll()
         .map { it.toClient().toString() })
 
@@ -45,7 +45,7 @@ class ManagerServiceImpl(
     }
 
     @Transactional
-    override fun getHistory(idUser: Long) = registrationBot.sendRecord(historyRepository
+    override fun getHistory(idUser: Long) = registrationBot.sendRecordToMng(historyRepository
         .findByClient(idUser.toInt())
         .map { it.toRecord().toString() })
 }

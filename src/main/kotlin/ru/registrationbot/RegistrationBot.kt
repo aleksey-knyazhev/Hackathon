@@ -142,11 +142,11 @@ class RegistrationBot : TelegramLongPollingBot() {
                         }
                     }
                     messageText.startsWith("Показать мои записи") -> {
-                        scheduleService.getDates()
+                        clientService.getClientWithActualRecords(UserInfo(message))
                         "Для отмены записи введите команду \"Отмена id\", где id - номер записи"
                     }
                     messageText.startsWith("Отмена ") -> {
-                        scheduleService.getDates()
+                        clientService.cancelRecording(messageText.split(" ")[1].toLong())
                         "Запись отменена"
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
@@ -272,12 +272,20 @@ class RegistrationBot : TelegramLongPollingBot() {
     /**
      * Для отправки списка записей/истории/списка клиентов менеджеру
      */
-    fun sendRecord(records: List<String>) {
+    fun sendRecordToMng(records: List<String>) {
         val buttons: List<String> = listOf("Главное меню")
-        sendNotification(manager, records.joinToString("\n"), buttons)
+        sendNotification(manager, records.joinToString("\n\n"), buttons)
     }
 
-    @Scheduled(cron = "7 0 0 * * *")
+    /**
+     * Для отправки списка записей клиенту
+     */
+    fun sendRecordToClient(chatId: Long, records: List<String>) {
+        val buttons: List<String> = listOf("Главное меню")
+        sendNotification(chatId, records.joinToString("\n\n"), buttons)
+    }
+
+    @Scheduled(cron = "0 13 14 * * *")
     private fun sendNotificationBySchedule() {
         val currentDate = LocalDateTime.now()
         for (date in scheduleService.getDates()) {
