@@ -1,6 +1,7 @@
 package ru.registrationbot.api.service
 
 import ru.registrationbot.api.dto.AutoNotificationDTO
+import ru.registrationbot.api.dto.TimeSlotDTO
 import ru.registrationbot.api.dto.UserInfo
 import ru.registrationbot.api.enums.DBServiceAnswer
 import ru.registrationbot.impl.entities.ClientsEntity
@@ -23,7 +24,7 @@ interface ClientService {
      * при удалении записи нужно оповестить клиента с помощью метода sendCancelNotification() класса RegistrationBot
      */
     //Возвращается chatId, если запись была найдена или null, чтобы можно было отправить сообщение клиенту
-    fun deleteRecording(idRecording: Long)
+    fun deleteRecording(idRecording: Long) : Boolean
 
 
     /**
@@ -42,9 +43,20 @@ interface ClientService {
     fun cancelRecording(userInfo: UserInfo): DBServiceAnswer
 
     /**
+     * Метод для удаления записи
+     * idRecording - id таймслота клиента
+     * Ищем запись на завтрашний день для указанного id слота и освобождаем ее
+     */
+    fun cancelRecording(idRecording: Long)
+
+    /**
      * Метод для получения списка забронированных слотов, chatId и имени клиента
      *  для конкретной даты (для автооповещения)
      */
     fun getBookedTimeWithClient(date: LocalDate):List<AutoNotificationDTO>
 
+    /**
+     * Метод для получения списка записей клиента на даты, начиная с текущей
+     */
+    fun getClientWithActualRecords(userInfo: UserInfo)
 }

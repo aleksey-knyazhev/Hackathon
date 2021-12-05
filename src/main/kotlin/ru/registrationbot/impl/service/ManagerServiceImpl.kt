@@ -25,7 +25,7 @@ class ManagerServiceImpl(
     lateinit var registrationBot: RegistrationBot
 
     @Transactional
-    override fun getAllUsers() = registrationBot.sendRecord(clientRepository
+    override fun getAllUsers() = registrationBot.sendRecordToMng(clientRepository
         .findAll()
         .map { it.toClient().toString() })
 
@@ -39,11 +39,13 @@ class ManagerServiceImpl(
                 it.status = TimeslotStatus.FREE
                 scheduleRepository.save(it)
             }
+        var userChatId = clientRepository.findById(idUser.toInt()).get().chatId
         clientRepository.deleteById(idUser.toInt())
+        registrationBot.sendDeleteNotification(userChatId)
     }
 
     @Transactional
-    override fun getHistory(idUser: Long) = registrationBot.sendRecord(historyRepository
+    override fun getHistory(idUser: Long) = registrationBot.sendRecordToMng(historyRepository
         .findByClient(idUser.toInt())
         .map { it.toRecord().toString() })
 }

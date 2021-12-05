@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 import ru.registrationbot.api.dto.UserInfo
+import ru.registrationbot.api.enums.DBServiceAnswer
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.service.ManagerService
 import ru.registrationbot.api.service.ReportService
@@ -34,8 +35,6 @@ class RegistrationBot : TelegramLongPollingBot() {
     @Value("\${telegram.doctor.chatId}")
     private val manager: Long = 0
 
-    //видимость chatid на весь класс
-    var chatId = 1L
     var date = ""
     var time = ""
 
@@ -47,6 +46,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     lateinit var clientService: ClientService
 
     @Autowired
+    @Lazy
     lateinit var reportService: ReportService
 
     @Autowired
@@ -60,7 +60,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     override fun onUpdateReceived(update: Update) {
         if (update.hasMessage()) {
             val message = update.message
-            chatId = message.chatId
+            val chatId = message.chatId
             val buttons: MutableList<String> = mutableListOf("Главное меню")
             val responseText = if (message.hasText()) {
                 val messageText = message.text
@@ -69,6 +69,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                         messageText == "/start" -> {
                             buttons.add("Открыть запись")
                             buttons.add("Показать свободное время")
+                            buttons.add("Показать мои записи")
                             buttons.add("Показать список подтвержденных записей на завтра")
                             buttons.add("Показать список неподтвержденных записей на завтра")
                             buttons.add("Показать список клиентов")
@@ -92,9 +93,12 @@ class RegistrationBot : TelegramLongPollingBot() {
                             reportService.getUnconfirmedRecording()
                             "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
                         }
-                        messageText.startsWith("Отменить") -> {
-                            clientService.deleteRecording(messageText.split(" ")[1].toLong())
-                            "Запись удалена"
+                        messageText.matches(Regex("\\Dтменить \\d+")) -> {
+                            if (clientService.deleteRecording(messageText.split(" ")[1].toLong())) {
+                                "Запись удалена"
+                            } else {
+                                "Что-то пошло не так"
+                            }
                         }
                         messageText.startsWith("Показать список клиентов") -> {
                             managerService.getAllUsers()
@@ -102,50 +106,102 @@ class RegistrationBot : TelegramLongPollingBot() {
                                     "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
                                     "id - номер пользователя"
                         }
-                        messageText.startsWith("История") -> {
+                        messageText.matches(Regex("\\Dстория \\d+")) -> {
                             managerService.getHistory(messageText.split(" ")[1].toLong())
                             "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
                                     "id - номер пользователя"
                         }
-                        messageText.startsWith("Удалить") -> {
+                        messageText.matches(Regex("\\Dдалить \\d+")) -> {
                             managerService.deleteUserInfo(messageText.split(" ")[1].toLong())
                             "Пользователь и его записи удалены"
                         }
-                        else -> "Вы написали: *$messageText*"
+                        else -> "Вы написали: *$messageText*. Такой команды я не знаю"
                     }
                 } else {
-                    when {
-                        messageText == "/start" -> {
+                    when (messageText) {
+                        "/start" -> {
                             buttons.add("Показать свободное время")
+                            buttons.add("Показать мои записи")
                             "Добро пожаловать!"
-                        }
-                        messageText.startsWith("Подтвердить") -> {
-                            clientService.confirmRecording(UserInfo(message))
-                            "Запись успешно подтверждена"
-                        }
-                        messageText.startsWith("Отменить запись") -> {
-                            clientService.cancelRecording(UserInfo(message))
-                            "Запись отменена"
                         }
                         else -> "Вы написали: *$messageText*"
                     }
                 }
                 when {
                     messageText.startsWith("Показать свободное время") -> {
-                        scheduleService.getDates()
-                            .forEach { buttons.add(it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()) }
-                        "Выберите дату"
+                        val freeDates = scheduleService.getDates()
+                        if (freeDates.isEmpty()) {
+                            "Свободного времени для записи нет"
+                        } else {
+                            freeDates
+                                .forEach {
+                                    buttons.add(it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString())
+                                }
+                            "Выберите дату"
+                        }
+                    }
+                    messageText.startsWith("Показать мои записи") -> {
+                        clientService.getClientWithActualRecords(UserInfo(message))
+                        "Для отмены записи введите команду \"Отмена id\", где id - номер записи"
+                    }
+                    messageText.matches(Regex("\\Dтмена \\d+")) -> {
+                        clientService.cancelRecording(messageText.split(" ")[1].toLong())
+                        "Запись отменена"
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
-                        buttons.addAll(scheduleService.getTimesForDate(LocalDate.parse(messageText,
-                            DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                        val freeRecords = scheduleService.getTimesForDate(LocalDate.parse(messageText,
+                            DateTimeFormatter.ofPattern("dd-MM-yyyy")))
+                        buttons.addAll(freeRecords)
                         "Выберите свободное время для записи"
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}  \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
                         val dateTime = messageText.split("  ")
-                        clientService.addRecording(LocalDate.parse(dateTime[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                        val action = clientService.addRecording(LocalDate.parse(dateTime[0],
+                            DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                             LocalTime.parse(dateTime[1].split("-")[0]), UserInfo(message))
-                        "Запись создана успешно"
+                        when (action) {
+                            DBServiceAnswer.SUCCESS -> {
+                                "Запись создана успешно"
+                            }
+                            DBServiceAnswer.RECORD_ALREADY_EXIST -> {
+                                "Вы уже записаны на эту дату"
+                            }
+                            else -> {
+                                "Что-то пошло не так. Попробуйте снова"
+                            }
+                        }
+                    }
+                    messageText.startsWith("Подтвердить") -> {
+                        when (clientService.confirmRecording(UserInfo(message))) {
+                            DBServiceAnswer.SUCCESS -> {
+                                "/start"
+                            }
+                            DBServiceAnswer.CLIENT_NOT_FOUND -> {
+                                "Клиент не найден в базе"
+                            }
+                            DBServiceAnswer.RECORD_NOT_FOUND -> {
+                                "Запись не найдена"
+                            }
+                            else -> {
+                                "Что-то пошло не так. Попробуйте снова"
+                            }
+                        }
+                    }
+                    messageText.equals("Отменить запись") -> {
+                        when (clientService.cancelRecording(UserInfo(message))) {
+                            DBServiceAnswer.SUCCESS -> {
+                                "/start"
+                            }
+                            DBServiceAnswer.CLIENT_NOT_FOUND -> {
+                                "Клиент не найден в базе"
+                            }
+                            DBServiceAnswer.RECORD_NOT_FOUND -> {
+                                "Запись не найдена"
+                            }
+                            else -> {
+                                "Что-то пошло не так. Попробуйте снова"
+                            }
+                        }
                     }
                     messageText.startsWith("Главное меню") -> {
                         date = ""
@@ -188,16 +244,16 @@ class RegistrationBot : TelegramLongPollingBot() {
             "Подтвердить запись",
             "Отменить запись"
         )
-        val text = "Хотели бы вам напомнить, что $date в $time вы записаны на прием. Подтвердите запись или отмените ее"
+        val text =
+            "Хотели бы вам напомнить, что $date в $time вы записаны на прием. Подтвердите запись или отмените ее"
         sendNotification(chatId, text, buttons)
     }
 
     /**
-     * Для отправки уведомления клиенту об отмененной записи
+     * Для отправки уведомления клиенту
      */
-    fun sendCancelNotificationToClient(chatId: Long, time: String) {
+    fun sendNotificationToClient(chatId: Long, text: String) {
         val buttons: List<String> = listOf("Главное меню")
-        val text = "Извините, Ваша запись на завтра в $time отменена"
         sendNotification(chatId, text, buttons)
     }
 
@@ -211,28 +267,35 @@ class RegistrationBot : TelegramLongPollingBot() {
     }
 
     /**
-     * Для отправки уведомления менеджеру о отмене записи клиентом
+     * Для отправки уведомления менеджеру
      */
-    fun sendCancelNotificationToMng(userName: String, time: String) {
+    fun sendNotificationToMng(text: String) {
         val buttons: List<String> = listOf("Главное меню")
-        val text = "Клиент $userName отменил запись на завтра в $time"
         sendNotification(manager, text, buttons)
     }
 
     /**
      * Для отправки списка записей/истории/списка клиентов менеджеру
      */
-    fun sendRecord(records: List<String>) {
+    fun sendRecordToMng(records: List<String>) {
         val buttons: List<String> = listOf("Главное меню")
-        sendNotification(manager, records.joinToString("\n"), buttons)
+        sendNotification(manager, records.joinToString("\n\n"), buttons)
     }
 
-    @Scheduled(cron = "7 0 0 * * *")
+    /**
+     * Для отправки списка записей клиенту
+     */
+    fun sendRecordToClient(chatId: Long, records: List<String>) {
+        val buttons: List<String> = listOf("Главное меню")
+        sendNotification(chatId, records.joinToString("\n\n"), buttons)
+    }
+
+    @Scheduled(cron = "0 30 17 * * *")
     private fun sendNotificationBySchedule() {
-        val currentDate = LocalDateTime.now()
+        val currentDate = LocalDate.now().atStartOfDay()
         for (date in scheduleService.getDates()) {
-            val duration = Duration.between(currentDate, date)
-            if (duration.toDays() == 1L) {
+            val duration = Duration.between(currentDate, date.atStartOfDay())
+            if (duration.toDays() <= 1L)  {
                 for (client in clientService.getBookedTimeWithClient(date)) {
                     requestConfirmation(client.chatId, date.toString(), client.timeStart.toString())
                 }
