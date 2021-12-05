@@ -13,7 +13,7 @@ interface ScheduleRepository : CrudRepository<ScheduleEntity, Long> {
 
     fun findByStatusAndRecordDate(status: TimeslotStatus, date: LocalDate): List<ScheduleEntity>
 
-    fun findByClient(clientId: Int): Optional<ScheduleEntity>
-
     fun findByRecordDateAndTimeStart(date:LocalDate, time: LocalTime): Optional<ScheduleEntity>
+
+    fun findByClient(clientId: Int): List<ScheduleEntity>
 }
