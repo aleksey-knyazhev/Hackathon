@@ -145,7 +145,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                     }
                     messageText.matches(Regex("\\Dтмена \\d+")) -> {
                         clientService.cancelRecording(messageText.split(" ")[1].toLong())
-                        "Запись отменена"
+                        "Запись отменена. Не бойтесь стоматологов."
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
                         val freeRecords = scheduleService.getTimesForDate(LocalDate.parse(messageText,
