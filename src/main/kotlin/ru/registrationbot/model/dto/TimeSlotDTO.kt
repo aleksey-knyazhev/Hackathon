@@ -11,6 +11,7 @@ class TimeSlotDTO(var idRecording: Long,
                   var firstName: String?
 ) {
     override fun toString(): String {
-        return "$idRecording\t\t${recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))}\t$timeStart-$timeEnd"
+        return "${recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))}\t$timeStart-$timeEnd. " +
+                "Отменить запись: /cancel\\_$idRecording"
     }
 }
