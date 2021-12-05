@@ -9,8 +9,10 @@ class ClientDto(
     val lastName: String?
 ) {
     override fun toString(): String {
-        return "$idRecording ${firstName.orEmpty()} " +
+        return "${firstName.orEmpty()} " +
                 "${lastName.orEmpty()} " +
-                "@${userName.orEmpty().replace("@","").replace("_", "\\_")} ${phone.orEmpty()}"
+                "@${userName.orEmpty().replace("@","").replace("_", "\\_")} ${phone.orEmpty()}\n" +
+                "Посмотреть историю клиента: /history\\_$idRecording\n" +
+                "Удалить данные и записи клиента: /delete\\_$idRecording"
     }
 }
