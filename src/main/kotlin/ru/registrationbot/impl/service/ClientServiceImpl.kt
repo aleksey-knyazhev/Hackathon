@@ -18,6 +18,7 @@ import ru.registrationbot.impl.entities.ScheduleEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.transaction.Transactional
 
 @Service
@@ -89,7 +90,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         repositoryTime.save(record)
         var textToMng = "Клиент " +
                 "@${clientUserName!!.replace("@","").replace("_", "\\_")} " +
-                "отменил запись ${record.recordDate} ${record.timeStart}-${record.timeEnd}"
+                "отменил запись ${record.recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} ${record.timeStart}-${record.timeEnd}"
         registrationBot.sendNotificationToMng(textToMng)
         return DBServiceAnswer.SUCCESS
     }

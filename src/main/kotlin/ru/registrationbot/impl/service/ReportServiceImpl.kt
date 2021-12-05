@@ -8,6 +8,7 @@ import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.api.service.ReportService
 import ru.registrationbot.impl.entities.ClientsEntity
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Service
 class ReportServiceImpl(
@@ -33,7 +34,9 @@ class ReportServiceImpl(
         for(record in records)
         {
             val client = clients.get(record.client)!!
-            result.add("${record.id} ${record.recordDate} ${client.firstName.orEmpty()} " +
+            result.add("${record.id} " +
+                    "${record.recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} " +
+                    "${client.firstName.orEmpty()} " +
                     "@${client.userName.orEmpty().replace("@","").replace("_", "\\_")} " +
                     client.phone.orEmpty()
             )
