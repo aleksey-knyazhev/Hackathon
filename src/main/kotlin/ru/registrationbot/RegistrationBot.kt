@@ -147,11 +147,9 @@ class RegistrationBot : TelegramLongPollingBot() {
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}  \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
                         val dateTime = messageText.split("  ")
-                        clientService.addRecording(LocalDate.parse(dateTime[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                        val action = clientService.addRecording(LocalDate.parse(dateTime[0],
+                            DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                             LocalTime.parse(dateTime[1].split("-")[0]), UserInfo(message))
-                        "Запись создана успешно"
-                    messageText.matches(Regex("\\d+ \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
-                        val action = clientService.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
                         if (action == DBServiceAnswer.SUCCESS) {
                             "Запись создана успешно"
                         } else {
@@ -161,7 +159,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                     messageText.startsWith("Подтвердить") -> {
                         when (clientService.confirmRecording(UserInfo(message))) {
                             DBServiceAnswer.SUCCESS -> {
-                                "Запись отменена"
+                                "Запись успешно подтверждена"
                             }
                             DBServiceAnswer.CLIENT_NOT_FOUND -> {
                                 "Клиент не найден в базе"
@@ -173,7 +171,6 @@ class RegistrationBot : TelegramLongPollingBot() {
                                 "Что-то пошло не так. Попробуйте снова"
                             }
                         }
-                        "Запись успешно подтверждена"
                     }
                     messageText.startsWith("Отменить запись") -> {
                         when (clientService.cancelRecording(UserInfo(message))) {
@@ -232,7 +229,8 @@ class RegistrationBot : TelegramLongPollingBot() {
             "Подтвердить запись",
             "Отменить запись"
         )
-        val text = "Хотели бы вам напомнить, что $date в $time вы записаны на прием. Подтвердите запись или отмените ее"
+        val text =
+            "Хотели бы вам напомнить, что $date в $time вы записаны на прием. Подтвердите запись или отмените ее"
         sendNotification(chatId, text, buttons)
     }
 
