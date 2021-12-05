@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 import ru.registrationbot.api.dto.UserInfo
+import ru.registrationbot.api.enums.DBServiceAnswer
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.service.ManagerService
 import ru.registrationbot.api.service.ReportService
@@ -92,8 +93,11 @@ class RegistrationBot : TelegramLongPollingBot() {
                             "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
                         }
                         messageText.startsWith("Отменить") -> {
-                            clientService.deleteRecording(messageText.split(" ")[1].toLong())
-                            "Запись удалена"
+                            if (clientService.deleteRecording(messageText.split(" ")[1].toLong())) {
+                                "Запись удалена"
+                            } else {
+                                "Что-то пошло не так"
+                            }
                         }
                         messageText.startsWith("Показать список клиентов") -> {
                             managerService.getAllUsers()
@@ -113,36 +117,73 @@ class RegistrationBot : TelegramLongPollingBot() {
                         else -> "Вы написали: *$messageText*"
                     }
                 } else {
-                    when {
-                        messageText == "/start" -> {
+                    when (messageText) {
+                        "/start" -> {
                             buttons.add("Показать свободное время")
                             "Добро пожаловать!"
-                        }
-                        messageText.startsWith("Подтвердить") -> {
-                            clientService.confirmRecording(UserInfo(message))
-                            "Запись успешно подтверждена"
-                        }
-                        messageText.startsWith("Отменить запись") -> {
-                            clientService.cancelRecording(UserInfo(message))
-                            "Запись отменена"
                         }
                         else -> "Вы написали: *$messageText*"
                     }
                 }
                 when {
                     messageText.startsWith("Показать свободное время") -> {
-                        scheduleService.getDates()
-                            .forEach { buttons.add(it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()) }
-                        "Выберите дату"
+                        val freeDates = scheduleService.getDates()
+                        if (freeDates.isEmpty()) {
+                            "Свободного времени для записи нет"
+                        } else {
+                            freeDates
+                                .forEach {
+                                    buttons.add(it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString())
+                                }
+                            "Выберите дату"
+                        }
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
-                        buttons.addAll(scheduleService.getTimesForDate(LocalDate.parse(messageText,
-                            DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                        val freeRecords = scheduleService.getTimesForDate(LocalDate.parse(messageText,
+                            DateTimeFormatter.ofPattern("dd-MM-yyyy")))
+                        buttons.addAll(freeRecords)
                         "Выберите свободное время для записи"
                     }
                     messageText.matches(Regex("\\d+ \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
-                        clientService.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
-                        "Запись создана успешно"
+                        val action = clientService.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
+                        if (action == DBServiceAnswer.SUCCESS) {
+                            "Запись создана успешно"
+                        } else {
+                            "Что-то пошло не так. Попробуйте снова"
+                        }
+                    }
+                    messageText.startsWith("Подтвердить") -> {
+                        when (clientService.confirmRecording(UserInfo(message))) {
+                            DBServiceAnswer.SUCCESS -> {
+                                "Запись отменена"
+                            }
+                            DBServiceAnswer.CLIENT_NOT_FOUND -> {
+                                "Клиент не найден в базе"
+                            }
+                            DBServiceAnswer.RECORD_NOT_FOUND -> {
+                                "Запись не найдена"
+                            }
+                            else -> {
+                                "Что-то пошло не так. Попробуйте снова"
+                            }
+                        }
+                        "Запись успешно подтверждена"
+                    }
+                    messageText.startsWith("Отменить запись") -> {
+                        when (clientService.cancelRecording(UserInfo(message))) {
+                            DBServiceAnswer.SUCCESS -> {
+                                "Запись отменена"
+                            }
+                            DBServiceAnswer.CLIENT_NOT_FOUND -> {
+                                "Клиент не найден в базе"
+                            }
+                            DBServiceAnswer.RECORD_NOT_FOUND -> {
+                                "Запись не найдена"
+                            }
+                            else -> {
+                                "Что-то пошло не так. Попробуйте снова"
+                            }
+                        }
                     }
                     messageText.startsWith("Главное меню") -> {
                         date = ""

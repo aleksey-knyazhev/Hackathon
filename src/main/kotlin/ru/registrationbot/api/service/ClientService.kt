@@ -22,7 +22,7 @@ interface ClientService {
      * при удалении записи нужно оповестить клиента с помощью метода sendCancelNotification() класса RegistrationBot
      */
     //Возвращается chatId, если запись была найдена или null, чтобы можно было отправить сообщение клиенту
-    fun deleteRecording(idRecording: Long)
+    fun deleteRecording(idRecording: Long) : Boolean
 
 
     /**
