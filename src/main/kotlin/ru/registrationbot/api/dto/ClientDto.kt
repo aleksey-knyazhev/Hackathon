@@ -10,6 +10,7 @@ class ClientDto(
 ) {
     override fun toString(): String {
         return "$idRecording ${firstName.orEmpty()} " +
-                "${lastName.orEmpty()} @${userName.orEmpty().replace("@","")} ${phone.orEmpty()}"
+                "${lastName.orEmpty()} " +
+                "@${userName.orEmpty().replace("@","").replace("_", "\\_")} ${phone.orEmpty()}"
     }
 }
