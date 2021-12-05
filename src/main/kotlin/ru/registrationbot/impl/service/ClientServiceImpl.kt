@@ -16,6 +16,7 @@ import ru.registrationbot.impl.entities.HistoryEntity
 import ru.registrationbot.impl.entities.ScheduleEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.transaction.Transactional
 
 @Service
@@ -29,7 +30,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
     lateinit var registrationBot: RegistrationBot
 
     @Transactional
-    override fun addRecording(idRecording: Long, user: UserInfo):DBServiceAnswer {
+    override fun addRecording(date:LocalDate, time: LocalTime, user: UserInfo):DBServiceAnswer {
         var client = repositoryClient.findByChatId(user.chatId).orElse(null)
         if (client == null)
         {
@@ -41,7 +42,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                 lastName = user.lastName)
             repositoryClient.save(client)
         }
-        val record = repositoryTime.findById(idRecording).orElse(null)
+        val record = repositoryTime.findByRecordDateAndTimeStart(date, time).orElse(null)
         return if (record != null  && TimeslotStatus.FREE == record.status)
                 {
                     record.status = TimeslotStatus.BOOKED
@@ -80,7 +81,10 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
             return DBServiceAnswer.CLIENT_NOT_FOUND
         }
 
-        val record = repositoryTime.findByClient(client.id!!).orElse(null)
+        val record = repositoryTime.findByClient(client.id!!)
+            .filter { it.recordDate == LocalDate.now().plusDays(1) }
+            .singleOrNull()
+
         if (record == null)
             return DBServiceAnswer.RECORD_NOT_FOUND
 

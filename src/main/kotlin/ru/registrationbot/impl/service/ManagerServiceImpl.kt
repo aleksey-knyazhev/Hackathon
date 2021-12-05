@@ -6,14 +6,19 @@ import org.springframework.transaction.annotation.Transactional
 import ru.registrationbot.RegistrationBot
 import ru.registrationbot.api.converter.toClient
 import ru.registrationbot.api.converter.toRecord
+import ru.registrationbot.api.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ClientRepository
 import ru.registrationbot.api.repository.HistoryRepository
+import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.api.service.ManagerService
+import ru.registrationbot.impl.entities.ScheduleEntity
+import java.time.LocalDateTime
 
 @Service
 class ManagerServiceImpl(
     private val clientRepository: ClientRepository,
-    private val historyRepository: HistoryRepository
+    private val historyRepository: HistoryRepository,
+    private val scheduleRepository: ScheduleRepository
 ) : ManagerService {
 
     @Autowired
@@ -27,6 +32,13 @@ class ManagerServiceImpl(
 
     @Transactional
     override fun deleteUserInfo(idUser: Long) {
+        scheduleRepository.findByClient(idUser.toInt())
+            .filter { LocalDateTime.of(it.recordDate, it.timeStart) > LocalDateTime.now() }
+            .forEach {
+                it.client = null
+                it.status = TimeslotStatus.FREE
+                scheduleRepository.save(it)
+            }
         clientRepository.deleteById(idUser.toInt())
     }
 

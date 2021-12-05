@@ -13,6 +13,7 @@ import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.dto.UserInfo
 import ru.registrationbot.api.service.ReportService
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
@@ -21,19 +22,19 @@ import kotlin.random.Random
 class StubController(@Autowired private var service: ClientService, @Autowired private var reportService: ReportService) {
 
     //idTimeSlot - id записи таблицы Scheduler с проверкой добавления клиента
-    @GetMapping(value = ["/add/{idTimeSlot}"])
-    fun addRecording(@PathVariable idTimeSlot: Long): ResponseEntity<Any> {
+    @GetMapping(value = ["/add/{date}/{time}"])
+    fun addRecording(@PathVariable time : String, @PathVariable date : String): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.addRecording(idTimeSlot, UserInfo(getMessage(Random.nextLong(1000L)))))
+            .body(service.addRecording(LocalDate.parse(date),LocalTime.parse(time), UserInfo(getMessage(Random.nextLong(1000L)))))
 
     }
 
     //idTimeSlot - id записи таблицы Scheduler
     // idChatClient- идентификатор чата из таблицы клиентов(это только для тестов - так он будет приходить к нам естественным путес с бота)
-    @GetMapping(value = ["/add/{idTimeSlot}/{idChatClient}"])
-    fun addRecording(@PathVariable idTimeSlot: Long, @PathVariable idChatClient: Long): ResponseEntity<Any> {
+    @GetMapping(value = ["/add/{date}/{time}/{idChatClient}"])
+    fun addRecording(@PathVariable time: String, @PathVariable idChatClient: Long, @PathVariable date : String): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(service.addRecording(idTimeSlot, UserInfo(getMessage(idChatClient))))
+            .body(service.addRecording(LocalDate.parse(date),LocalTime.parse(time), UserInfo(getMessage(idChatClient))))
 
     }
 
