@@ -119,7 +119,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                 } else {
                     when (messageText) {
                         "/start", "Главное меню" -> {
-                            buttons.add("Показать свободное время")
+                            buttons.add("Показать свободное время стоматологии ООО \"Зубки хрупки\"")
                             buttons.add("Показать мои записи")
                             "Добро пожаловать!"
                         }
