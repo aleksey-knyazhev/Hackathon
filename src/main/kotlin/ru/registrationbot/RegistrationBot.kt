@@ -48,6 +48,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     lateinit var clientService: ClientService
 
     @Autowired
+    @Lazy
     lateinit var reportService: ReportService
 
     @Autowired
@@ -94,7 +95,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                             reportService.getUnconfirmedRecording()
                             "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
                         }
-                        messageText.matches(Regex("Отменить \\d+")) -> {
+                        messageText.matches(Regex("\\Dтменить \\d+")) -> {
                             if (clientService.deleteRecording(messageText.split(" ")[1].toLong())) {
                                 "Запись удалена"
                             } else {
@@ -107,12 +108,12 @@ class RegistrationBot : TelegramLongPollingBot() {
                                     "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
                                     "id - номер пользователя"
                         }
-                        messageText.startsWith("История") -> {
+                        messageText.matches(Regex("\\Dстория \\d+")) -> {
                             managerService.getHistory(messageText.split(" ")[1].toLong())
                             "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
                                     "id - номер пользователя"
                         }
-                        messageText.startsWith("Удалить") -> {
+                        messageText.matches(Regex("\\Dдалить \\d+")) -> {
                             managerService.deleteUserInfo(messageText.split(" ")[1].toLong())
                             "Пользователь и его записи удалены"
                         }
@@ -145,7 +146,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                         clientService.getClientWithActualRecords(UserInfo(message))
                         "Для отмены записи введите команду \"Отмена id\", где id - номер записи"
                     }
-                    messageText.startsWith("Отмена ") -> {
+                    messageText.matches(Regex("\\Dтмена \\d+")) -> {
                         clientService.cancelRecording(messageText.split(" ")[1].toLong())
                         "Запись отменена"
                     }

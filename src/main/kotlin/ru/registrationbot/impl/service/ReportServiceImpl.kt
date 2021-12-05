@@ -1,6 +1,8 @@
 package ru.registrationbot.impl.service
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import ru.registrationbot.RegistrationBot
 import ru.registrationbot.api.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.api.service.ReportService
@@ -13,11 +15,14 @@ class ReportServiceImpl(
     private val serviceUtils: ServiceUtils
 ): ReportService {
 
+    @Autowired
+    lateinit var registrationBot: RegistrationBot
+
     override fun getUnconfirmedRecording() = getNotificationReportByStatus(TimeslotStatus.BOOKED)
 
     override fun getConfirmedRecording() = getNotificationReportByStatus(TimeslotStatus.CONFIRMED)
 
-    private fun getNotificationReportByStatus(status: TimeslotStatus): List<String>  {
+    private fun getNotificationReportByStatus(status: TimeslotStatus)  {
         val date = LocalDate.now().plusDays(1)
         //записи из расписния
         val records = repositoryTime.findByStatusAndRecordDate(status, date)
@@ -33,6 +38,6 @@ class ReportServiceImpl(
                     client.phone.orEmpty()
             )
         }
-        return result
+        registrationBot.sendRecordToMng(result)
     }
 }
