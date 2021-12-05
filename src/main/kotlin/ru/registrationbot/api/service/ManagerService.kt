@@ -1,8 +1,5 @@
 package ru.registrationbot.api.service
 
-import ru.registrationbot.api.dto.ClientDto
-import ru.registrationbot.api.dto.RecordDto
-
 interface ManagerService {
 
     /**

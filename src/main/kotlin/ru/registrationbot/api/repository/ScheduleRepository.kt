@@ -1,8 +1,8 @@
 package ru.registrationbot.api.repository
 
 import org.springframework.data.repository.CrudRepository
-import ru.registrationbot.impl.entities.ScheduleEntity
-import ru.registrationbot.api.enums.TimeslotStatus
+import ru.registrationbot.model.entities.ScheduleEntity
+import ru.registrationbot.model.enums.TimeslotStatus
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*

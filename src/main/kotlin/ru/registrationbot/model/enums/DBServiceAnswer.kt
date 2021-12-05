@@ -1,4 +1,4 @@
-package ru.registrationbot.api.enums
+package ru.registrationbot.model.enums
 
 enum class DBServiceAnswer {
     SUCCESS,

@@ -1,9 +1,9 @@
-package ru.registrationbot.api.converter
+package ru.registrationbot.model.converter
 
-import ru.registrationbot.api.dto.ClientDto
-import ru.registrationbot.api.dto.RecordDto
-import ru.registrationbot.impl.entities.ClientsEntity
-import ru.registrationbot.impl.entities.HistoryEntity
+import ru.registrationbot.model.dto.ClientDto
+import ru.registrationbot.model.dto.RecordDto
+import ru.registrationbot.model.entities.ClientsEntity
+import ru.registrationbot.model.entities.HistoryEntity
 
 fun ClientsEntity.toClient() = ClientDto(
     idRecording = checkNotNull(id).toLong(),

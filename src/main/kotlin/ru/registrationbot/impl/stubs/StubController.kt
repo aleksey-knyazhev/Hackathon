@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import org.telegram.telegrambots.meta.api.objects.Message
 import ru.registrationbot.api.service.ClientService
-import ru.registrationbot.api.dto.UserInfo
+import ru.registrationbot.model.dto.UserInfo
 import ru.registrationbot.api.service.ReportService
 import java.time.LocalDate
 import java.time.LocalTime

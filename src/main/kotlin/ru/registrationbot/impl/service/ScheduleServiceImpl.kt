@@ -3,8 +3,8 @@ package ru.registrationbot.impl.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.registrationbot.api.service.SchedulerService
-import ru.registrationbot.impl.entities.ScheduleEntity
-import ru.registrationbot.api.enums.TimeslotStatus
+import ru.registrationbot.model.entities.ScheduleEntity
+import ru.registrationbot.model.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ScheduleRepository
 import java.time.LocalDate
 import java.time.LocalDateTime

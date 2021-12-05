@@ -2,19 +2,18 @@ package ru.registrationbot.impl.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import ru.registrationbot.RegistrationBot
-import ru.registrationbot.api.dto.AutoNotificationDTO
-import ru.registrationbot.api.dto.TimeSlotDTO
+import ru.registrationbot.model.dto.AutoNotificationDTO
+import ru.registrationbot.model.dto.TimeSlotDTO
 import ru.registrationbot.api.service.ClientService
-import ru.registrationbot.api.enums.DBServiceAnswer
-import ru.registrationbot.api.dto.UserInfo
-import ru.registrationbot.impl.entities.ClientsEntity
-import ru.registrationbot.api.enums.TimeslotStatus
+import ru.registrationbot.model.enums.DBServiceAnswer
+import ru.registrationbot.model.dto.UserInfo
+import ru.registrationbot.model.entities.ClientsEntity
+import ru.registrationbot.model.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ClientRepository
 import ru.registrationbot.api.repository.HistoryRepository
 import ru.registrationbot.api.repository.ScheduleRepository
-import ru.registrationbot.impl.entities.HistoryEntity
-import ru.registrationbot.impl.entities.ScheduleEntity
+import ru.registrationbot.model.entities.HistoryEntity
+import ru.registrationbot.model.entities.ScheduleEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
