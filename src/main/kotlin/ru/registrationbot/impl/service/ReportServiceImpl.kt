@@ -33,11 +33,11 @@ class ReportServiceImpl(
         for(record in records)
         {
             val client = clients.get(record.client)!!
-            result.add("${record.id} " +
-                    "${record.recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} " +
+            result.add("${record.recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} " +
                     "${client.firstName.orEmpty()} " +
                     "@${client.userName.orEmpty().replace("@","").replace("_", "\\_")} " +
-                    client.phone.orEmpty()
+                    client.phone.orEmpty() +
+                    "\nОтменить запись: /cancelrecord\\_${record.id}"
             )
         }
         if (result.isEmpty()){
