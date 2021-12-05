@@ -39,7 +39,9 @@ class ManagerServiceImpl(
                 it.status = TimeslotStatus.FREE
                 scheduleRepository.save(it)
             }
+        var userChatId = clientRepository.findById(idUser.toInt()).get().chatId
         clientRepository.deleteById(idUser.toInt())
+        registrationBot.sendDeleteNotification(userChatId)
     }
 
     @Transactional

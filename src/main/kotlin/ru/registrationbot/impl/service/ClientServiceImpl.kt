@@ -63,11 +63,11 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         val record = repositoryTime.findById(idRecording).orElse(null) ?: return false
 
         record.status = TimeslotStatus.BLOCKED
-        val clientChatId = repositoryClient.findById(record.client!!).get().chatId
+        val client = repositoryClient.findById(record.client!!).get()
         record.client = null
         repositoryTime.save(record)
-        val text = "Извините, Ваша запись на завтра в ${record.timeStart} отменена"
-        registrationBot.sendNotificationToClient(clientChatId, text)
+        val text = "${client.firstName}, извините, Ваша запись на завтра в ${record.timeStart} отменена"
+        registrationBot.sendNotificationToClient(client.chatId, text)
         return true
     }
 
