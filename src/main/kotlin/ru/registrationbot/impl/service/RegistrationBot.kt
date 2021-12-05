@@ -1,4 +1,4 @@
-package ru.registrationbot
+package ru.registrationbot.impl.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -11,15 +11,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
-import ru.registrationbot.api.dto.UserInfo
-import ru.registrationbot.api.enums.DBServiceAnswer
+import ru.registrationbot.model.dto.UserInfo
+import ru.registrationbot.model.enums.DBServiceAnswer
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.service.ManagerService
 import ru.registrationbot.api.service.ReportService
 import ru.registrationbot.api.service.SchedulerService
 import java.time.Duration
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 

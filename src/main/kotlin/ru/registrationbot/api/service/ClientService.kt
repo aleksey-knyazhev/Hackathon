@@ -1,10 +1,8 @@
 package ru.registrationbot.api.service
 
-import ru.registrationbot.api.dto.AutoNotificationDTO
-import ru.registrationbot.api.dto.TimeSlotDTO
-import ru.registrationbot.api.dto.UserInfo
-import ru.registrationbot.api.enums.DBServiceAnswer
-import ru.registrationbot.impl.entities.ClientsEntity
+import ru.registrationbot.model.dto.AutoNotificationDTO
+import ru.registrationbot.model.dto.UserInfo
+import ru.registrationbot.model.enums.DBServiceAnswer
 import java.time.LocalDate
 import java.time.LocalTime
 

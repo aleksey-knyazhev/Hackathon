@@ -1,4 +1,4 @@
-package ru.registrationbot.api.dto
+package ru.registrationbot.model.dto
 
 import java.time.LocalDateTime
 

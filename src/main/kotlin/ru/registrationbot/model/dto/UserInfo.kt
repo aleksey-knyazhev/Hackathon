@@ -1,4 +1,4 @@
-package ru.registrationbot.api.dto
+package ru.registrationbot.model.dto
 
 import org.telegram.telegrambots.meta.api.objects.Message
 

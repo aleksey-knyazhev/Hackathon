@@ -2,11 +2,10 @@ package ru.registrationbot.impl.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import ru.registrationbot.RegistrationBot
-import ru.registrationbot.api.enums.TimeslotStatus
+import ru.registrationbot.model.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.api.service.ReportService
-import ru.registrationbot.impl.entities.ClientsEntity
+import ru.registrationbot.model.entities.ClientsEntity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

@@ -2,7 +2,7 @@ package ru.registrationbot.impl.service
 
 import org.springframework.stereotype.Service
 import ru.registrationbot.api.repository.ClientRepository
-import ru.registrationbot.impl.entities.ScheduleEntity
+import ru.registrationbot.model.entities.ScheduleEntity
 import kotlin.streams.toList
 
 @Service
