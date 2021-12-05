@@ -60,13 +60,6 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                 { DBServiceAnswer.FREE_RECORD_NOT_FOUND }
     }
 
-
-//    @Transactional
-//    override fun deleteRecording(idRecording: Long) {
-//        val sendParameter = changeStatusTimeSlot(idRecording, TimeslotStatus.BLOCKED)
-//        registrationBot.sendCancelNotificationToClient(sendParameter.first, sendParameter.second)
-//    }
-//
     @Transactional
     override fun deleteRecording(idRecording: Long):Boolean {
         val record = repositoryTime.findById(idRecording).orElse(null) ?: return false

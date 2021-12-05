@@ -35,8 +35,6 @@ class RegistrationBot : TelegramLongPollingBot() {
     @Value("\${telegram.doctor.chatId}")
     private val manager: Long = 0
 
-    //видимость chatid на весь класс
-    var chatId = 1L
     var date = ""
     var time = ""
 
@@ -62,7 +60,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     override fun onUpdateReceived(update: Update) {
         if (update.hasMessage()) {
             val message = update.message
-            chatId = message.chatId
+            val chatId = message.chatId
             val buttons: MutableList<String> = mutableListOf("Главное меню")
             val responseText = if (message.hasText()) {
                 val messageText = message.text
@@ -117,7 +115,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                             managerService.deleteUserInfo(messageText.split(" ")[1].toLong())
                             "Пользователь и его записи удалены"
                         }
-                        else -> "Вы написали: *$messageText*"
+                        else -> "Вы написали: *$messageText*. Такой команды я не знаю"
                     }
                 } else {
                     when (messageText) {
@@ -286,7 +284,7 @@ class RegistrationBot : TelegramLongPollingBot() {
         sendNotification(chatId, records.joinToString("\n\n"), buttons)
     }
 
-    @Scheduled(cron = "0 13 14 * * *")
+    @Scheduled(cron = "0 30 17 * * *")
     private fun sendNotificationBySchedule() {
         val currentDate = LocalDate.now().atStartOfDay()
         for (date in scheduleService.getDates()) {

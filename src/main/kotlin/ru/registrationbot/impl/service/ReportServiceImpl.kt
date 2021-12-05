@@ -38,6 +38,10 @@ class ReportServiceImpl(
                     client.phone.orEmpty()
             )
         }
-        registrationBot.sendRecordToMng(result)
+        if (result.isEmpty()){
+            registrationBot.sendNotificationToMng("Не найдено соответствующих записей")
+        } else {
+            registrationBot.sendRecordToMng(result)
+        }
     }
 }
