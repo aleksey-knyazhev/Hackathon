@@ -1,11 +1,14 @@
 package ru.registrationbot.impl.service
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import ru.registrationbot.RegistrationBot
 import ru.registrationbot.api.enums.TimeslotStatus
 import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.api.service.ReportService
 import ru.registrationbot.impl.entities.ClientsEntity
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Service
 class ReportServiceImpl(
@@ -13,11 +16,14 @@ class ReportServiceImpl(
     private val serviceUtils: ServiceUtils
 ): ReportService {
 
+    @Autowired
+    lateinit var registrationBot: RegistrationBot
+
     override fun getUnconfirmedRecording() = getNotificationReportByStatus(TimeslotStatus.BOOKED)
 
     override fun getConfirmedRecording() = getNotificationReportByStatus(TimeslotStatus.CONFIRMED)
 
-    private fun getNotificationReportByStatus(status: TimeslotStatus): List<String>  {
+    private fun getNotificationReportByStatus(status: TimeslotStatus)  {
         val date = LocalDate.now().plusDays(1)
         //записи из расписния
         val records = repositoryTime.findByStatusAndRecordDate(status, date)
@@ -28,11 +34,17 @@ class ReportServiceImpl(
         for(record in records)
         {
             val client = clients.get(record.client)!!
-            result.add("${record.id} ${record.recordDate} ${client.firstName.orEmpty()} " +
+            result.add("${record.id} " +
+                    "${record.recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} " +
+                    "${client.firstName.orEmpty()} " +
                     "@${client.userName.orEmpty().replace("@","").replace("_", "\\_")} " +
                     client.phone.orEmpty()
             )
         }
-        return result
+        if (result.isEmpty()){
+            registrationBot.sendNotificationToMng("Не найдено соответствующих записей")
+        } else {
+            registrationBot.sendRecordToMng(result)
+        }
     }
 }
