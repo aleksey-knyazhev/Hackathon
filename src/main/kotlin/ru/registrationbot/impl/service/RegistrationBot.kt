@@ -141,10 +141,10 @@ class RegistrationBot : TelegramLongPollingBot() {
                     }
                     messageText.startsWith("Показать мои записи") -> {
                         clientService.getClientWithActualRecords(UserInfo(message))
-                        "Для отмены записи введите команду \"Отмена id\", где id - номер записи"
+                        "Для перехода в главное меню перейдите по ссылке /start"
                     }
-                    messageText.matches(Regex("\\Dтмена \\d+")) -> {
-                        clientService.cancelRecording(messageText.split(" ")[1].toLong())
+                    messageText.matches(Regex("/cancel_\\d+")) -> {
+                        clientService.cancelRecording(messageText.split("_")[1].toLong())
                         "Запись отменена"
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
