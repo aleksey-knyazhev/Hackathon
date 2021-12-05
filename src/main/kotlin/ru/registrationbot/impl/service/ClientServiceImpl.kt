@@ -18,6 +18,7 @@ import ru.registrationbot.impl.entities.ScheduleEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.transaction.Transactional
 
 @Service
@@ -64,26 +65,34 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
     }
 
     @Transactional
-    override fun deleteRecording(idRecording: Long) {
-        val sendParameter = changeStatusTimeSlot(idRecording, TimeslotStatus.BLOCKED)
-        registrationBot.sendCancelNotificationToClient(sendParameter.first, sendParameter.second)
-    }
+    override fun deleteRecording(idRecording: Long):Boolean {
+        val record = repositoryTime.findById(idRecording).orElse(null) ?: return false
 
+        record.status = TimeslotStatus.BLOCKED
+        val client = repositoryClient.findById(record.client!!).get()
+        record.client = null
+        repositoryTime.save(record)
+        val text = "${client.firstName}, извините, Ваша запись на завтра в ${record.timeStart} отменена"
+        registrationBot.sendNotificationToClient(client.chatId, text)
+        return true
+    }
     @Transactional
     override fun cancelRecording(idRecording: Long) {
-        val sendParameter = changeStatusTimeSlot(idRecording, TimeslotStatus.FREE)
+        changeStatusTimeSlot(idRecording, TimeslotStatus.FREE)
     }
 
-    private fun changeStatusTimeSlot(idRecording: Long, status: TimeslotStatus):Pair<Long, String>
-    {
+    private fun changeStatusTimeSlot(idRecording: Long, status: TimeslotStatus): DBServiceAnswer {
         val record = repositoryTime.findById(idRecording).orElse(null)
 
         record.status = status
-        val clientChatId = repositoryClient.findById(record.client!!).get().chatId
+        val clientUserName = repositoryClient.findById(record.client!!).get().userName
         record.client = null
         repositoryTime.save(record)
-
-        return Pair(clientChatId, record.timeStart.toString())
+        var textToMng = "Клиент " +
+                "@${clientUserName!!.replace("@","").replace("_", "\\_")} " +
+                "отменил запись ${record.recordDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} ${record.timeStart}-${record.timeEnd}"
+        registrationBot.sendNotificationToMng(textToMng)
+        return DBServiceAnswer.SUCCESS
     }
 
     override fun confirmRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED)
@@ -100,15 +109,27 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
             .singleOrNull()
             ?: return DBServiceAnswer.RECORD_NOT_FOUND
 
+        var textToMng = "Клиент " +
+                "@${userInfo.userName.replace("@","").replace("_", "\\_")} " +
+                "подтвердил запись на завтра в ${record.timeStart}"
+        var textToClient = "Ваша запись на завтра в ${record.timeStart} подтверждена"
+
         record.status = status
         if (status == TimeslotStatus.FREE)
         {
             record.client = null
+            textToMng = "Клиент " +
+                    "@${userInfo.userName.replace("@","").replace("_", "\\_")} " +
+                    "отменил запись на завтра в ${record.timeStart}"
+            textToClient = "Ваша запись на завтра в ${record.timeStart} отменена"
         }
 
         repositoryTime.save(record)
 
         addHistory(client, record)
+
+        registrationBot.sendNotificationToClient(userInfo.chatId, textToClient)
+        registrationBot.sendNotificationToMng(textToMng)
 
         return DBServiceAnswer.SUCCESS
     }
@@ -140,12 +161,12 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         return forNotification
     }
 
-    override fun getClientWithActualRecords(userInfo: UserInfo): List<TimeSlotDTO> {
+    override fun getClientWithActualRecords(userInfo: UserInfo) {
 
         val client = repositoryClient.findByChatId(userInfo.chatId).orElse(null)
-        ?: return listOf()
+        ?: return
 
-        val forNotification = mutableListOf<TimeSlotDTO>()
+        val forNotification = mutableListOf<String>()
 
         val records = repositoryTime.findByRecordDateAfterAndClient(LocalDate.now().minusDays(1L), client.id!!)
 
@@ -155,8 +176,12 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                 recordDate = record.recordDate,
                 timeStart = record.timeStart,
                 timeEnd = record.timeEnd,
-                firstName =  client.firstName))
+                firstName =  client.firstName).toString())
         }
-        return forNotification
+        if (forNotification.isEmpty()) {
+            registrationBot.sendNotificationToMng("Записей не найдено")
+        } else {
+            registrationBot.sendRecordToClient(userInfo.chatId, forNotification)
+        }
     }
 }

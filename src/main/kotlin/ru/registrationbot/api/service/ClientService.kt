@@ -24,7 +24,7 @@ interface ClientService {
      * при удалении записи нужно оповестить клиента с помощью метода sendCancelNotification() класса RegistrationBot
      */
     //Возвращается chatId, если запись была найдена или null, чтобы можно было отправить сообщение клиенту
-    fun deleteRecording(idRecording: Long)
+    fun deleteRecording(idRecording: Long) : Boolean
 
 
     /**
@@ -58,5 +58,5 @@ interface ClientService {
     /**
      * Метод для получения списка записей клиента на даты, начиная с текущей
      */
-    fun getClientWithActualRecords(userInfo: UserInfo): List<TimeSlotDTO>
+    fun getClientWithActualRecords(userInfo: UserInfo)
 }
