@@ -58,15 +58,14 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
 
 
     @Transactional
-    override fun deleteRecording(idRecording: Long):Int? {
-        val record = repositoryTime.findById(idRecording).orElse(null) ?: return null
+    override fun deleteRecording(idRecording: Long) {
+        val record = repositoryTime.findById(idRecording).orElse(null)
 
         record.status = TimeslotStatus.BLOCKED
         val clientChatId = repositoryClient.findById(record.client!!).get().chatId
         record.client = null
         repositoryTime.save(record)
         registrationBot.sendCancelNotificationToClient(clientChatId, record.timeStart.toString())
-        return 0
     }
 
     override fun confirmRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED)
