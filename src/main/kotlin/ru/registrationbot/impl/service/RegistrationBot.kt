@@ -65,7 +65,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                 val messageText = message.text
                 val text = if (chatId == manager) {
                     when {
-                        messageText == "/start" -> {
+                        messageText == "/start" || messageText == "Главное меню" -> {
                             buttons.add("Открыть запись")
                             buttons.add("Показать свободное время")
                             buttons.add("Показать мои записи")
@@ -74,7 +74,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                             buttons.add("Показать список клиентов")
                             "Здравствуй, хозяин!"
                         }
-                        messageText.startsWith("Открыть запись") -> "Введите дату в формате ГГГГ-ММ-ДД\nНапример: 2022-10-08"
+                        messageText.startsWith("Открыть запись") -> "Введите дату в формате ГГГГ-ММ-ДД\nНапример: 2021-12-01"
                         messageText.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) -> {
                             date = messageText
                             "Введите время первой и последней записи через пробел в формате hh:mm\nНапример: 10:00 18:00"
@@ -118,8 +118,8 @@ class RegistrationBot : TelegramLongPollingBot() {
                     }
                 } else {
                     when (messageText) {
-                        "/start" -> {
-                            buttons.add("Показать свободное время")
+                        "/start", "Главное меню" -> {
+                            buttons.add("Показать свободное время стоматологии ООО \"Зубки хрупки\"")
                             buttons.add("Показать мои записи")
                             "Добро пожаловать!"
                         }
@@ -145,7 +145,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                     }
                     messageText.matches(Regex("/cancel_\\d+")) -> {
                         clientService.cancelRecording(messageText.split("_")[1].toLong())
-                        "Запись отменена"
+                        "Запись отменена. Не бойтесь стоматологов."
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
                         val freeRecords = scheduleService.getTimesForDate(LocalDate.parse(messageText,
