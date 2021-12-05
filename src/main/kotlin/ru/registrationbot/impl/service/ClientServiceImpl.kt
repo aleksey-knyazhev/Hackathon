@@ -81,7 +81,10 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
             return DBServiceAnswer.CLIENT_NOT_FOUND
         }
 
-        val record = repositoryTime.findByClient(client.id!!).orElse(null)
+        val record = repositoryTime.findByClient(client.id!!)
+            .filter { it.recordDate == LocalDate.now().plusDays(1) }
+            .singleOrNull()
+
         if (record == null)
             return DBServiceAnswer.RECORD_NOT_FOUND
 
