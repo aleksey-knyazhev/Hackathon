@@ -1,6 +1,8 @@
 package ru.registrationbot.impl.service
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import ru.registrationbot.RegistrationBot
 import ru.registrationbot.api.dto.AutoNotificationDTO
 import ru.registrationbot.api.service.ClientService
 import ru.registrationbot.api.enums.DBServiceAnswer
@@ -22,6 +24,9 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                         private val repositoryHistory: HistoryRepository,
                         private val serviceUtils: ServiceUtils
 ) : ClientService {
+
+    @Autowired
+    lateinit var registrationBot: RegistrationBot
 
     @Transactional
     override fun addRecording(idRecording: Long, user: UserInfo):DBServiceAnswer {
@@ -57,10 +62,11 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         val record = repositoryTime.findById(idRecording).orElse(null) ?: return null
 
         record.status = TimeslotStatus.BLOCKED
-        val clientChatId = record.client
+        val clientChatId = repositoryClient.findById(record.client!!).get().chatId
         record.client = null
         repositoryTime.save(record)
-        return clientChatId
+        registrationBot.sendCancelNotificationToClient(clientChatId, record.timeStart.toString())
+        return 0
     }
 
     override fun confirmRecording(userInfo: UserInfo) = changeStatusTimeSlot(userInfo, TimeslotStatus.CONFIRMED)

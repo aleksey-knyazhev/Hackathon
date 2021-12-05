@@ -14,6 +14,8 @@ interface ClientRepository: CrudRepository<ClientsEntity, Long> {
 
     fun findByChatId(chatId: Long): Optional<ClientsEntity>
 
+    fun findById(id: Int): Optional<ClientsEntity>
+
     fun deleteById(id: Int)
 
     fun findByIdIn(id: Set<Int>): List<ClientsEntity>

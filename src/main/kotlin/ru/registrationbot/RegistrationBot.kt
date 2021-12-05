@@ -42,6 +42,7 @@ class RegistrationBot : TelegramLongPollingBot() {
     lateinit var scheduleService: SchedulerService
 
     @Autowired
+    @Lazy
     lateinit var clientService: ClientService
 
     @Autowired
@@ -109,11 +110,6 @@ class RegistrationBot : TelegramLongPollingBot() {
                             managerService.deleteUserInfo(messageText.split(" ")[1].toLong())
                             "Пользователь и его записи удалены"
                         }
-                        messageText.startsWith("Главное меню") -> {
-                            date = ""
-                            time = ""
-                            "/start"
-                        }
                         else -> "Вы написали: *$messageText*"
                     }
                 } else {
@@ -147,6 +143,11 @@ class RegistrationBot : TelegramLongPollingBot() {
                     messageText.matches(Regex("\\d+ \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
                         clientService.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
                         "Запись создана успешно"
+                    }
+                    messageText.startsWith("Главное меню") -> {
+                        date = ""
+                        time = ""
+                        "/start"
                     }
                     else -> text
                 }
