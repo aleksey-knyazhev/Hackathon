@@ -90,10 +90,10 @@ class RegistrationBot : TelegramLongPollingBot() {
                         }
                         messageText.startsWith("Показать список неподтвержденных записей на завтра") -> {
                             reportService.getUnconfirmedRecording()
-                            "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
+                            "Для перехода в главное меню перейдите по ссылке /start"
                         }
-                        messageText.matches(Regex("\\Dтменить \\d+")) -> {
-                            if (clientService.deleteRecording(messageText.split(" ")[1].toLong())) {
+                        messageText.matches(Regex("/cancelrecord_\\d+")) -> {
+                            if (clientService.deleteRecording(messageText.split("_")[1].toLong())) {
                                 "Запись удалена"
                             } else {
                                 "Что-то пошло не так"
@@ -101,18 +101,16 @@ class RegistrationBot : TelegramLongPollingBot() {
                         }
                         messageText.startsWith("Показать список клиентов") -> {
                             managerService.getAllUsers()
-                            "Для получения истории по клиенту введите команду \"История id\"\n" +
-                                    "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
-                                    "id - номер пользователя"
+                            "Для перехода в главное меню перейдите по ссылке /start"
                         }
-                        messageText.matches(Regex("\\Dстория \\d+")) -> {
-                            managerService.getHistory(messageText.split(" ")[1].toLong())
-                            "Для удаления информации о пользователе и его записей введите команду \"Удалить id\"\n" +
-                                    "id - номер пользователя"
+                        messageText.matches(Regex("/history_\\d+")) -> {
+                            managerService.getHistory(messageText.split("_")[1].toLong())
+                            "Для перехода в главное меню перейдите по ссылке /start"
                         }
-                        messageText.matches(Regex("\\Dдалить \\d+")) -> {
-                            managerService.deleteUserInfo(messageText.split(" ")[1].toLong())
-                            "Пользователь и его записи удалены"
+                        messageText.matches(Regex("/delete_\\d+")) -> {
+                            managerService.deleteUserInfo(messageText.split("_")[1].toLong())
+                            "Пользователь и его записи удалены\n" +
+                                    "Для перехода в главное меню перейдите по ссылке /start"
                         }
                         else -> "Вы написали: *$messageText*. Такой команды я не знаю"
                     }
