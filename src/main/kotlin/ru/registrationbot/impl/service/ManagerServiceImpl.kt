@@ -1,7 +1,9 @@
 package ru.registrationbot.impl.service
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.registrationbot.RegistrationBot
 import ru.registrationbot.api.converter.toClient
 import ru.registrationbot.api.converter.toRecord
 import ru.registrationbot.api.repository.ClientRepository
@@ -14,10 +16,14 @@ class ManagerServiceImpl(
     private val historyRepository: HistoryRepository
 ) : ManagerService {
 
+    @Autowired
+    lateinit var registrationBot: RegistrationBot
+
     @Transactional
-    override fun getAllUsers() = clientRepository
+    override fun getAllUsers() = registrationBot.sendRecord(clientRepository
         .findAll()
-        .map { it.toClient() }
+        .map { it.toClient().toString() })
+
 
     @Transactional
     override fun deleteUserInfo(idUser: Long) {
@@ -25,7 +31,7 @@ class ManagerServiceImpl(
     }
 
     @Transactional
-    override fun getHistory(idUser: Long) = historyRepository
+    override fun getHistory(idUser: Long) = registrationBot.sendRecord(historyRepository
         .findByClient(idUser.toInt())
-        .map { it.toRecord() }
+        .map { it.toRecord().toString() })
 }
