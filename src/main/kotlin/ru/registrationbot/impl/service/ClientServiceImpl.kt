@@ -91,7 +91,9 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         val clientUserName = repositoryClient.findById(record.client!!).get().userName
         record.client = null
         repositoryTime.save(record)
-        var textToMng = "Клиент @$clientUserName отменил запись ${record.recordDate} ${record.timeStart}-${record.timeEnd}"
+        var textToMng = "Клиент " +
+                "@${clientUserName!!.replace("@","").replace("_", "\\_")} " +
+                "отменил запись ${record.recordDate} ${record.timeStart}-${record.timeEnd}"
         registrationBot.sendNotificationToMng(textToMng)
         return DBServiceAnswer.SUCCESS
     }
@@ -110,14 +112,18 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
             .singleOrNull()
             ?: return DBServiceAnswer.RECORD_NOT_FOUND
 
-        var textToMng = "Клиент @${userInfo.userName} подтвердил запись на завтра в ${record.timeStart}"
+        var textToMng = "Клиент " +
+                "@${userInfo.userName.replace("@","").replace("_", "\\_")} " +
+                "подтвердил запись на завтра в ${record.timeStart}"
         var textToClient = "Ваша запись на завтра в ${record.timeStart} подтверждена"
 
         record.status = status
         if (status == TimeslotStatus.FREE)
         {
             record.client = null
-            textToMng = "Клиент @${userInfo.userName} отменил запись на завтра в ${record.timeStart}"
+            textToMng = "Клиент " +
+                    "@${userInfo.userName.replace("@","").replace("_", "\\_")} " +
+                    "отменил запись на завтра в ${record.timeStart}"
             textToClient = "Ваша запись на завтра в ${record.timeStart} отменена"
         }
 
