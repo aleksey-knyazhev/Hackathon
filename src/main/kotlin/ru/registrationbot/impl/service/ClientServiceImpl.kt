@@ -15,11 +15,9 @@ import ru.registrationbot.api.repository.HistoryRepository
 import ru.registrationbot.api.repository.ScheduleRepository
 import ru.registrationbot.impl.entities.HistoryEntity
 import ru.registrationbot.impl.entities.ScheduleEntity
-import java.text.DateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import javax.transaction.Transactional
 
 @Service
@@ -43,8 +41,13 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                 userName = user.userName,
                 firstName = user.firstName,
                 lastName = user.lastName)
-            repositoryClient.save(client)
+
+            client = repositoryClient.save(client)
         }
+
+        if (repositoryTime.findByClientAndRecordDate(client.id!!, date).isPresent)
+            return DBServiceAnswer.RECORD_ALREADY_EXIST
+
         val record = repositoryTime.findByRecordDateAndTimeStart(date, time).orElse(null)
         return if (record != null  && TimeslotStatus.FREE == record.status)
                 {
@@ -59,7 +62,6 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                 else
                 { DBServiceAnswer.FREE_RECORD_NOT_FOUND }
     }
-
 
     @Transactional
     override fun deleteRecording(idRecording: Long) {
