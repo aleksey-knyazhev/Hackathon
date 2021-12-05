@@ -66,7 +66,8 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         val clientChatId = repositoryClient.findById(record.client!!).get().chatId
         record.client = null
         repositoryTime.save(record)
-        registrationBot.sendCancelNotificationToClient(clientChatId, record.timeStart.toString())
+        val text = "Извините, Ваша запись на завтра в ${record.timeStart} отменена"
+        registrationBot.sendNotificationToClient(clientChatId, text)
         return true
     }
 
@@ -89,15 +90,23 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         if (record == null)
             return DBServiceAnswer.RECORD_NOT_FOUND
 
+        var textToMng = "Клиент @${userInfo.userName} подтвердил запись на завтра в ${record.timeStart}"
+        var textToClient = "Ваша запись на завтра в ${record.timeStart} подтверждена"
+
         record.status = status
         if (status == TimeslotStatus.FREE)
         {
             record.client = null
+            textToMng = "Клиент @${userInfo.userName} отменил запись на завтра в ${record.timeStart}"
+            textToClient = "Ваша запись на завтра в ${record.timeStart} отменена"
         }
 
         repositoryTime.save(record)
 
         addHistory(client, record)
+
+        registrationBot.sendNotificationToClient(userInfo.chatId, textToClient)
+        registrationBot.sendNotificationToMng(textToMng)
 
         return DBServiceAnswer.SUCCESS
     }

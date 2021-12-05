@@ -70,6 +70,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                         messageText == "/start" -> {
                             buttons.add("Открыть запись")
                             buttons.add("Показать свободное время")
+                            buttons.add("Показать мои записи")
                             buttons.add("Показать список подтвержденных записей на завтра")
                             buttons.add("Показать список неподтвержденных записей на завтра")
                             buttons.add("Показать список клиентов")
@@ -93,7 +94,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                             reportService.getUnconfirmedRecording()
                             "Для удаления записи введите команду \"Отменить id\", где id - номер записи"
                         }
-                        messageText.startsWith("Отменить") -> {
+                        messageText.matches(Regex("Отменить \\d+")) -> {
                             if (clientService.deleteRecording(messageText.split(" ")[1].toLong())) {
                                 "Запись удалена"
                             } else {
@@ -121,6 +122,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                     when (messageText) {
                         "/start" -> {
                             buttons.add("Показать свободное время")
+                            buttons.add("Показать мои записи")
                             "Добро пожаловать!"
                         }
                         else -> "Вы написали: *$messageText*"
@@ -138,6 +140,14 @@ class RegistrationBot : TelegramLongPollingBot() {
                                 }
                             "Выберите дату"
                         }
+                    }
+                    messageText.startsWith("Показать мои записи") -> {
+                        scheduleService.getDates()
+                        "Для отмены записи введите команду \"Отмена id\", где id - номер записи"
+                    }
+                    messageText.startsWith("Отмена ") -> {
+                        scheduleService.getDates()
+                        "Запись отменена"
                     }
                     messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}")) -> {
                         val freeRecords = scheduleService.getTimesForDate(LocalDate.parse(messageText,
@@ -159,7 +169,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                     messageText.startsWith("Подтвердить") -> {
                         when (clientService.confirmRecording(UserInfo(message))) {
                             DBServiceAnswer.SUCCESS -> {
-                                "Запись успешно подтверждена"
+                                "/start"
                             }
                             DBServiceAnswer.CLIENT_NOT_FOUND -> {
                                 "Клиент не найден в базе"
@@ -172,10 +182,10 @@ class RegistrationBot : TelegramLongPollingBot() {
                             }
                         }
                     }
-                    messageText.startsWith("Отменить запись") -> {
+                    messageText.equals("Отменить запись") -> {
                         when (clientService.cancelRecording(UserInfo(message))) {
                             DBServiceAnswer.SUCCESS -> {
-                                "Запись отменена"
+                                "/start"
                             }
                             DBServiceAnswer.CLIENT_NOT_FOUND -> {
                                 "Клиент не найден в базе"
@@ -235,11 +245,10 @@ class RegistrationBot : TelegramLongPollingBot() {
     }
 
     /**
-     * Для отправки уведомления клиенту об отмененной записи
+     * Для отправки уведомления клиенту
      */
-    fun sendCancelNotificationToClient(chatId: Long, time: String) {
+    fun sendNotificationToClient(chatId: Long, text: String) {
         val buttons: List<String> = listOf("Главное меню")
-        val text = "Извините, Ваша запись на завтра в $time отменена"
         sendNotification(chatId, text, buttons)
     }
 
@@ -253,11 +262,10 @@ class RegistrationBot : TelegramLongPollingBot() {
     }
 
     /**
-     * Для отправки уведомления менеджеру о отмене записи клиентом
+     * Для отправки уведомления менеджеру
      */
-    fun sendCancelNotificationToMng(userName: String, time: String) {
+    fun sendNotificationToMng(text: String) {
         val buttons: List<String> = listOf("Главное меню")
-        val text = "Клиент $userName отменил запись на завтра в $time"
         sendNotification(manager, text, buttons)
     }
 
