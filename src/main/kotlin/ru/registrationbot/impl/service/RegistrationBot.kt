@@ -65,7 +65,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                 val messageText = message.text
                 val text = if (chatId == manager) {
                     when {
-                        messageText == "/start" -> {
+                        messageText == "/start" || messageText == "Главное меню" -> {
                             buttons.add("Открыть запись")
                             buttons.add("Показать свободное время")
                             buttons.add("Показать мои записи")
@@ -118,7 +118,7 @@ class RegistrationBot : TelegramLongPollingBot() {
                     }
                 } else {
                     when (messageText) {
-                        "/start" -> {
+                        "/start", "Главное меню" -> {
                             buttons.add("Показать свободное время")
                             buttons.add("Показать мои записи")
                             "Добро пожаловать!"
