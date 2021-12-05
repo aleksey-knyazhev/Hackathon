@@ -50,17 +50,17 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
 
         val record = repositoryTime.findByRecordDateAndTimeStart(date, time).orElse(null)
         return if (record != null  && TimeslotStatus.FREE == record.status)
-                {
-                    record.status = TimeslotStatus.BOOKED
-                    record.client = client.id
+        {
+            record.status = TimeslotStatus.BOOKED
+            record.client = client.id
 
-                    repositoryTime.save(record)
-                    addHistory(client, record)
+            repositoryTime.save(record)
+            addHistory(client, record)
 
-                    DBServiceAnswer.SUCCESS
-                }
-                else
-                { DBServiceAnswer.FREE_RECORD_NOT_FOUND }
+            DBServiceAnswer.SUCCESS
+        }
+        else
+        { DBServiceAnswer.FREE_RECORD_NOT_FOUND }
     }
 
     @Transactional
@@ -152,10 +152,10 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
         for (record in records)
         {
             forNotification.add(AutoNotificationDTO(chatId = clients.get(record.client)!!.chatId,
-                                                    recordDate = record.recordDate,
-                                                    timeStart = record.timeStart,
-                                                    timeEnd = record.timeEnd,
-                                                    firstName =  clients.get(record.client)!!.firstName))
+                recordDate = record.recordDate,
+                timeStart = record.timeStart,
+                timeEnd = record.timeEnd,
+                firstName =  clients.get(record.client)!!.firstName))
         }
         return forNotification
     }
@@ -163,7 +163,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
     override fun getClientWithActualRecords(userInfo: UserInfo) {
 
         val client = repositoryClient.findByChatId(userInfo.chatId).orElse(null)
-        ?: return
+            ?: return
 
         val forNotification = mutableListOf<String>()
 
@@ -178,7 +178,7 @@ class ClientServiceImpl(private val repositoryTime: ScheduleRepository,
                 firstName =  client.firstName).toString())
         }
         if (forNotification.isEmpty()) {
-            registrationBot.sendNotificationToMng("Записей не найдено")
+            registrationBot.sendNotificationToClient(userInfo.chatId,"Записей не найдено")
         } else {
             registrationBot.sendRecordToClient(userInfo.chatId, forNotification)
         }
