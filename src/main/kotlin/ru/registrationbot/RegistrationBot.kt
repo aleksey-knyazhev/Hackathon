@@ -19,6 +19,7 @@ import ru.registrationbot.api.service.SchedulerService
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @EnableScheduling
@@ -140,8 +141,10 @@ class RegistrationBot : TelegramLongPollingBot() {
                             DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                         "Выберите свободное время для записи"
                     }
-                    messageText.matches(Regex("\\d+ \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
-                        clientService.addRecording(messageText.split(" ")[0].toLong(), UserInfo(message))
+                    messageText.matches(Regex("\\d{2}-\\d{2}-\\d{4}  \\d{2}:\\d{2}-\\d{2}:\\d{2}")) -> {
+                        val dateTime = messageText.split("  ")
+                        clientService.addRecording(LocalDate.parse(dateTime[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                            LocalTime.parse(dateTime[1].split("-")[0]), UserInfo(message))
                         "Запись создана успешно"
                     }
                     messageText.startsWith("Главное меню") -> {
