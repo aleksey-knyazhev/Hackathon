@@ -1,0 +1,22 @@
+CMD:
+heroku open --app=public-registration-bot
+heroku logs --tail --app=public-registration-bot
+
+heroku restart --app=public-registration-bot
+heroku run bash --app=public-registration-bot
+
+heroku ps:scale --app=public-registration-bot
+heroku ps:scale web=1 --app=public-registration-bot
+
+Bash:
+:detached java -jar target/RegistrationBot-0.0.1-SNAPSHOT.jar
+java -jar target/RegistrationBot-0.0.1-SNAPSHOT.jar
+java -Dserver.port=$PORT $JAVA_OPTS -jar target/*.jar
+java -jar target/RegistrationBot-0.0.1-SNAPSHOT.jar --port $PORT target/*.war
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar target/*.jar
+
+Web-интерфейс:
+java -jar target/RegistrationBot-0.0.1-SNAPSHOT.jar
+
+Procfile:
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar target/*.jar
